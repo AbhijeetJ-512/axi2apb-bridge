@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "../src/axi2apb.v"
+`include "./src/axi2apb.v"
 
 module tb_axi2apb;
 

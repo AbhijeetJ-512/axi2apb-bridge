@@ -1,0 +1,38 @@
+# run.ys
+
+# Read source files
+
+read_verilog  ./src/*.v
+read_liberty -lib ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Define top module
+hierarchy -top axi2apb
+
+# Perform synthesis
+proc
+opt
+
+fsm
+opt
+
+memory
+opt
+
+techmap
+opt
+
+dfflibmap -liberty ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+opt
+
+abc -liberty ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+opt
+
+flatten
+clean -purge
+stat -liberty ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+tee -o build/reports/stat.txt stat -liberty ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+
+# Write synthesized netlist
+# write_json build/synth.json
+write_verilog build/synth.v

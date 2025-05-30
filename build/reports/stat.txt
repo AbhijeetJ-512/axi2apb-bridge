@@ -1,0 +1,46 @@
+18. Printing statistics.
+
+=== axi2apb ===
+
+   Number of wires:                443
+   Number of wire bits:            695
+   Number of public wires:          28
+   Number of public wire bits:     280
+   Number of ports:                 26
+   Number of port bits:            245
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                555
+     sky130_fd_sc_hd__a2111oi_0      1
+     sky130_fd_sc_hd__a211o_1        1
+     sky130_fd_sc_hd__a211oi_1       1
+     sky130_fd_sc_hd__a21bo_1        1
+     sky130_fd_sc_hd__a21boi_0      32
+     sky130_fd_sc_hd__a21oi_1       33
+     sky130_fd_sc_hd__a22oi_1       64
+     sky130_fd_sc_hd__and3b_1        1
+     sky130_fd_sc_hd__and4_1         1
+     sky130_fd_sc_hd__and4b_1        1
+     sky130_fd_sc_hd__clkinv_1       3
+     sky130_fd_sc_hd__dfxtp_1      133
+     sky130_fd_sc_hd__lpflow_isobufsrc_1      6
+     sky130_fd_sc_hd__mux2i_1        1
+     sky130_fd_sc_hd__nand2_1       32
+     sky130_fd_sc_hd__nand2b_1       1
+     sky130_fd_sc_hd__nand3_1        1
+     sky130_fd_sc_hd__nand3b_1       1
+     sky130_fd_sc_hd__nor2_1       131
+     sky130_fd_sc_hd__nor3b_1        2
+     sky130_fd_sc_hd__nor4_1         1
+     sky130_fd_sc_hd__nor4b_1        1
+     sky130_fd_sc_hd__nor4bb_1       1
+     sky130_fd_sc_hd__o21a_1         1
+     sky130_fd_sc_hd__o21ai_0      100
+     sky130_fd_sc_hd__o22ai_1        1
+     sky130_fd_sc_hd__o31a_1         1
+     sky130_fd_sc_hd__o41a_1         2
+
+   Chip area for module '\axi2apb': 4885.936000
+     of which used for sequential elements: 2662.553600 (54.49%)
+
