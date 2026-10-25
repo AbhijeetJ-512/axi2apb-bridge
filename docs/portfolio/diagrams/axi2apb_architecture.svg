@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="950.4pt" height="460.8pt" viewBox="0 0 950.4 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-21T04:19:06.448108</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8 
+L 950.4 460.8 
+L 950.4 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 173.52 43.2 
+L 766.08 43.2 
+Q 770.4 43.2 770.4 47.52 
+L 770.4 377.28 
+Q 770.4 381.6 766.08 381.6 
+L 173.52 381.6 
+Q 169.2 381.6 169.2 377.28 
+L 169.2 47.52 
+Q 169.2 43.2 173.52 43.2 
+L 173.52 43.2 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke-dasharray: 7.8,5.2; stroke-dashoffset: 0; stroke: #888888; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: start; fill: #555555" x="174.96" y="375.385957" transform="rotate(-0 174.96 375.385957)">axi2apb  (DATA_WIDTH = ADDR_WIDTH = 32, one clock, synchronous active-low reset)</text>
+   </g>
+   <g id="patch_3">
+    <path d="M 14.4 93.6 
+L 151.2 93.6 
+L 151.2 331.2 
+L 14.4 331.2 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #eeeeee; stroke: #666666; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 233.64 72 
+L 471.96 72 
+Q 496.8 72 496.8 96.84 
+L 496.8 129.96 
+Q 496.8 154.8 471.96 154.8 
+L 233.64 154.8 
+Q 208.8 154.8 208.8 129.96 
+L 208.8 96.84 
+Q 208.8 72 233.64 72 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #e1d5e7; stroke: #9673a6; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 539.424 72 
+L 742.176 72 
+Q 748.8 72 748.8 78.624 
+L 748.8 148.176 
+Q 748.8 154.8 742.176 154.8 
+L 539.424 154.8 
+Q 532.8 154.8 532.8 148.176 
+L 532.8 78.624 
+Q 532.8 72 539.424 72 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #ffe6cc; stroke: #d79b00; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 213.12 194.4 
+L 326.88 194.4 
+Q 331.2 194.4 331.2 198.72 
+L 331.2 244.08 
+Q 331.2 248.4 326.88 248.4 
+L 213.12 248.4 
+Q 208.8 248.4 208.8 244.08 
+L 208.8 198.72 
+Q 208.8 194.4 213.12 194.4 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #dae8fc; stroke: #6c8ebf; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 371.52 194.4 
+L 492.48 194.4 
+Q 496.8 194.4 496.8 198.72 
+L 496.8 244.08 
+Q 496.8 248.4 492.48 248.4 
+L 371.52 248.4 
+Q 367.2 248.4 367.2 244.08 
+L 367.2 198.72 
+Q 367.2 194.4 371.52 194.4 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #dae8fc; stroke: #6c8ebf; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 213.696 280.8 
+L 491.904 280.8 
+Q 496.8 280.8 496.8 285.696 
+L 496.8 337.104 
+Q 496.8 342 491.904 342 
+L 213.696 342 
+Q 208.8 342 208.8 337.104 
+L 208.8 285.696 
+Q 208.8 280.8 213.696 280.8 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #d5e8d4; stroke: #82b366; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 792 93.6 
+L 928.8 93.6 
+L 928.8 331.2 
+L 792 331.2 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #eeeeee; stroke: #666666; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 793.44 2.88 
+L 923.04 2.88 
+L 923.04 38.88 
+L 793.44 38.88 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #ffffff; stroke: #bbbbbb; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 151.2 141.12 
+L 208.8 113.4 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke-dasharray: 10.8,7.2; stroke-dashoffset: 0; stroke: #c55a11; stroke-width: 1.8"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 151.2 212.4 
+L 208.8 221.4 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke: #1f4e9c; stroke-width: 2.2"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 331.2 221.4 
+L 367.2 221.4 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke: #1f4e9c; stroke-width: 2.2"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 496.8 221.4 
+L 792 212.4 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke: #1f4e9c; stroke-width: 2.2"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 496.8 113.4 
+L 532.8 113.4 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke-dasharray: 10.8,7.2; stroke-dashoffset: 0; stroke: #c55a11; stroke-width: 1.8"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 748.8 96.84 
+L 792 141.12 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke-dasharray: 10.8,7.2; stroke-dashoffset: 0; stroke: #c55a11; stroke-width: 1.8"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 860.4 93.6 
+L 860.4 59.04 
+L 352.8 59.04 
+L 352.8 72 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke-dasharray: 10.8,7.2; stroke-dashoffset: 0; stroke: #c55a11; stroke-width: 1.8"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 860.4 331.2 
+L 860.4 363.6 
+L 410.4 363.6 
+L 410.4 342 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke: #1f4e9c; stroke-width: 2.2"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 208.8 311.4 
+L 151.2 307.44 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke: #1f4e9c; stroke-width: 2.2"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 799.2 11.52 
+L 825.12 11.52 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke: #1f4e9c; stroke-width: 2.2; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 799.2 25.92 
+L 825.12 25.92 
+" clip-path="url(#p0cf0a5774b)" style="fill: none; stroke-dasharray: 10.8,7.2; stroke-dashoffset: 0; stroke: #c55a11; stroke-width: 1.8"/>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #111111" x="475.2" y="19.711143" transform="rotate(-0 475.2 19.711143)">AXI4-Lite to APB3 bridge - architecture</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #111111" x="82.8" y="191.62207" transform="rotate(-0 82.8 191.62207)">AXI4-Lite master</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(24.376758 202.110527)">AR: ARADDR ARVALID ARREADY</text>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(20.213672 210.558574)">R : RDATA RRESP RVALID RREADY</text>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(21.745312 219.003105)">AW: AWADDR AWVALID AWREADY</text>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(30.714258 227.449395)">W : WDATA WVALID WREADY</text>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(33.960938 235.897441)">B : BRESP BVALID BREADY</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 8.25px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #111111" x="352.8" y="102.366357" transform="rotate(-0 352.8 102.366357)">Control FSM  (present_state / next_state)</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(221.832598 112.106748)">IDLE, WRITE_ADDRESS_RECEIVED, WRITE_DATA_RECEIVED, PENABLE_WRITE,</text>
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(235.707539 119.708408)">WDATA_TRANSFERRED, READ_ADDRESS_RECEIVED, PENABLE_READ,</text>
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(266.464863 127.369658)">RDATA_TRANSFERRED   -   a read request wins in IDLE</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 8.25px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #111111" x="640.8" y="102.366357" transform="rotate(-0 640.8 102.366357)">Output decode</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(565.712578 112.742725)">ARREADY AWREADY WREADY RVALID BVALID</text>
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(601.724355 120.345967)">PSEL PENABLE PWRITE</text>
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(590.523574 127.369658)">(each a function of present_state)</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 8.25px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #111111" x="270" y="214.585107" transform="rotate(-0 270 214.585107)">sampled_addr</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(235.370391 224.52958)">ARADDR or AWADDR,</text>
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(247.112754 232.653838)">latched in IDLE</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 8.25px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #111111" x="432" y="214.567061" transform="rotate(-0 432 214.567061)">PADDR / PWDATA regs</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(390.727969 224.385088)">loaded when W is accepted</text>
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(409.304707 232.653838)">or a read starts</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 8.25px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #111111" x="352.8" y="304.567061" transform="rotate(-0 352.8 304.567061)">Response registers</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(212.103105 314.38667)">RDATA &lt;= PRDATA (if !PSLVERR);  BRESP, RRESP &lt;= PSLVERR ? SLVERR (2'b10) : OKAY</text>
+    <text style="font-size: 6.75px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(260.677266 321.986748)">(the as-found RTL returned DECERR, 2'b11: change CH-001)</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #111111" x="860.4" y="200.990742" transform="rotate(-0 860.4 200.990742)">APB3 slave</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(818.716406 211.487285)">PADDR PSEL PENABLE</text>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(829.289648 219.931816)">PWRITE PWDATA</text>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #333333" transform="translate(811.286133 228.379863)">PREADY PRDATA PSLVERR</text>
+   </g>
+   <g id="patch_11">
+    <path d="M 208.8 113.4 
+L 200.102295 113.590579 
+L 203.224548 120.078378 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #c55a11; stroke: #c55a11; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 151.2 141.12 
+L 159.897705 140.929421 
+L 156.775452 134.441622 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #c55a11; stroke: #c55a11; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 208.8 221.4 
+L 201.530701 216.620492 
+L 200.419188 223.734178 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #1f4e9c; stroke: #1f4e9c; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 367.2 221.4 
+L 359.28 217.8 
+L 359.28 225 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #1f4e9c; stroke: #1f4e9c; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 792 212.4 
+L 783.973973 209.043023 
+L 784.193383 216.239679 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #1f4e9c; stroke: #1f4e9c; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 532.8 113.4 
+L 524.88 109.8 
+L 524.88 117 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #c55a11; stroke: #c55a11; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 792 141.12 
+L 789.04609 132.937041 
+L 783.89246 137.964973 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #c55a11; stroke: #c55a11; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 352.8 72 
+L 356.4 64.08 
+L 349.2 64.08 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #c55a11; stroke: #c55a11; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 410.4 342 
+L 406.8 349.92 
+L 414 349.92 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #1f4e9c; stroke: #1f4e9c; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 151.2 307.44 
+L 158.854432 311.57474 
+L 159.348266 304.391696 
+z
+" clip-path="url(#p0cf0a5774b)" style="fill: #1f4e9c; stroke: #1f4e9c; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_17">
+    <text style="font-style: italic; font-size: 8.25px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #222222" transform="translate(14.4 410.157312)">One transaction at a time: a read or write is accepted in IDLE, one APB transfer is performed (setup phase, then access phase until PREADY), and the response is held until the master takes it.</text>
+    <text style="font-style: italic; font-size: 8.25px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #222222" transform="translate(14.4 419.805139)">AWREADY and WREADY are asserted together and only in WRITE_ADDRESS_RECEIVED, so write data that arrives before its address waits. A read request has priority over a simultaneous write request.</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 8.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: start; fill: #222222" x="830.88" y="13.719707" transform="rotate(-0 830.88 13.719707)">data path</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 8.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: start; fill: #222222" x="830.88" y="28.119707" transform="rotate(-0 830.88 28.119707)">control / status</text>
+   </g>
+   <g id="text_20">
+    <g id="patch_21">
+     <path d="M 152.794336 116.69436 
+L 207.205664 116.69436 
+L 207.205664 99.30564 
+L 152.794336 99.30564 
+z
+" style="fill: #ffffff; opacity: 0.9"/>
+    </g>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #c55a11" transform="translate(153.394336 106.633484)">VALID / READY</text>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; fill: #c55a11" transform="translate(159.777539 114.727844)">handshakes</text>
+   </g>
+   <g id="text_21">
+    <g id="patch_22">
+     <path d="M 144.256641 209.84718 
+L 215.743359 209.84718 
+L 215.743359 200.55282 
+L 144.256641 200.55282 
+z
+" style="fill: #ffffff; opacity: 0.9"/>
+    </g>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #1f4e9c" x="180" y="207.880664" transform="rotate(-0 180 207.880664)">ARADDR / AWADDR</text>
+   </g>
+   <g id="text_22">
+    <g id="patch_23">
+     <path d="M 616.981641 214.88718 
+L 679.018359 214.88718 
+L 679.018359 205.59282 
+L 616.981641 205.59282 
+z
+" style="fill: #ffffff; opacity: 0.9"/>
+    </g>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #1f4e9c" x="648" y="212.34" transform="rotate(-0 648 212.34)">PADDR, PWDATA</text>
+   </g>
+   <g id="text_23">
+    <g id="patch_24">
+     <path d="M 727.760156 89.60718 
+L 820.239844 89.60718 
+L 820.239844 80.31282 
+L 727.760156 80.31282 
+z
+" style="fill: #ffffff; opacity: 0.9"/>
+    </g>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #c55a11" x="774" y="87.098672" transform="rotate(-0 774 87.098672)">PSEL, PENABLE, PWRITE</text>
+   </g>
+   <g id="text_24">
+    <g id="patch_25">
+     <path d="M 595.978125 57.92718 
+L 628.021875 57.92718 
+L 628.021875 48.63282 
+L 595.978125 48.63282 
+z
+" style="fill: #ffffff; opacity: 0.9"/>
+    </g>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #c55a11" x="612" y="55.859883" transform="rotate(-0 612 55.859883)">PREADY</text>
+   </g>
+   <g id="text_25">
+    <g id="patch_26">
+     <path d="M 613.433203 362.48718 
+L 682.566797 362.48718 
+L 682.566797 353.19282 
+L 613.433203 353.19282 
+z
+" style="fill: #ffffff; opacity: 0.9"/>
+    </g>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #1f4e9c" x="648" y="359.978672" transform="rotate(-0 648 359.978672)">PRDATA, PSLVERR</text>
+   </g>
+   <g id="text_26">
+    <g id="patch_27">
+     <path d="M 127.129102 362.48718 
+L 211.270898 362.48718 
+L 211.270898 353.19282 
+L 127.129102 353.19282 
+z
+" style="fill: #ffffff; opacity: 0.9"/>
+    </g>
+    <text style="font-size: 7.5px; font-family: 'Liberation Sans', 'DejaVu Sans'; text-anchor: middle; fill: #1f4e9c" x="169.2" y="359.978672" transform="rotate(-0 169.2 359.978672)">RDATA, RRESP, BRESP</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p0cf0a5774b">
+   <rect x="0" y="0" width="950.4" height="460.8"/>
+  </clipPath>
+ </defs>
+</svg>
