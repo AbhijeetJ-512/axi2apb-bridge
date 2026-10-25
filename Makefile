@@ -8,6 +8,7 @@ help:
 	@echo "make baseline  the as-found RTL against the same testbench: shows the PSLVERR bug -> results/baseline_original.txt"
 	@echo "make cov       merged coverage (named cover points + lines)                       -> results/coverage_summary.txt"
 	@echo "make mutants   15 injected bugs, with and without the assertions                  -> results/mutants.txt"
+	@echo "make ppa       Yosys + OpenSTA, as-found vs fixed, default vs timing-driven       -> results/ppa.md"
 	@echo "make check     lint seeds cov"
 	@echo "make clean"
 
@@ -15,7 +16,7 @@ help:
 lint:
 	@verilator --lint-only -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL -Wno-CASEINCOMPLETE src/axi2apb.v --top-module axi2apb && echo "[LINT] clean except two known, documented warnings (unused sampled_wdata register; output-decode case without default)"
 
-.PHONY: seeds baseline cov mutants
+.PHONY: seeds baseline cov mutants ppa
 seeds:
 	@$(PYTHON) scripts/campaign.py seeds
 baseline:
@@ -24,6 +25,8 @@ cov:
 	@$(PYTHON) scripts/campaign.py cov
 mutants:
 	@$(PYTHON) scripts/campaign.py mutants --jobs 3
+ppa:
+	@$(PYTHON) ppa/ppa.py
 
 .PHONY: check
 check: lint seeds cov
