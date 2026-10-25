@@ -1,0 +1,18 @@
+mutants: 15, caught 14 (3 seeds x 600 random items + directed phases each; with and without the assertions)
+survivors are annotated in the table; see docs for the reason (B14 is an equivalent mutant)
+
+B01  KILLED    PENABLE asserted already in the setup phase of a write                 assertions: a_bresp_maps_slverr,a_first_cycle_is_setup,a_penable_drops without assertions (testbench only): NOT CAUGHT
+B02  KILLED    write ignores APB wait states (leaves the access phase at once)        assertions: a_access_until_ready,a_bvalid_only_after_write,a_dir_stable without assertions (testbench only): testbench
+B03  KILLED    read ignores APB wait states                                           assertions: a_access_until_ready,a_rvalid_only_after_read  without assertions (testbench only): testbench
+B04  KILLED    APB write error swallowed: BRESP always OKAY                           assertions: a_bresp_maps_slverr                            without assertions (testbench only): testbench
+B05  KILLED    APB read error swallowed: RRESP always OKAY                            assertions: a_rresp_maps_slverr                            without assertions (testbench only): testbench
+B06  KILLED    write response dropped without waiting for BREADY                      assertions: a_bvalid_holds                                 without assertions (testbench only): testbench
+B07  KILLED    read data dropped without waiting for RREADY                           assertions: a_rvalid_holds                                 without assertions (testbench only): testbench
+B08  KILLED    read uses the write address                                            assertions: -                                              without assertions (testbench only): testbench
+B09  KILLED    write data is one beat stale                                           assertions: -                                              without assertions (testbench only): testbench
+B10  KILLED    WREADY asserted in IDLE as well (data accepted before an address)      assertions: a_aw_w_ready_together                          without assertions (testbench only): testbench
+B11  KILLED    PWRITE dropped in the access phase of a write                          assertions: a_bvalid_only_after_write,a_rresp_maps_slverr,a_setup_to_access_same without assertions (testbench only): testbench
+B12  KILLED    write has priority over read when both are requested                   assertions: a_read_priority                                without assertions (testbench only): testbench
+B13  KILLED    PSEL dropped in the setup phase of a read                              assertions: a_first_cycle_is_setup                         without assertions (testbench only): NOT CAUGHT
+B14  SURVIVED  read data captured without the PREADY qualifier (final value still cor assertions: -                                              without assertions (testbench only): NOT CAUGHT
+B15  KILLED    read data not registered: RDATA follows PRDATA combinationally is not  assertions: a_rdata_is_prdata                              without assertions (testbench only): testbench

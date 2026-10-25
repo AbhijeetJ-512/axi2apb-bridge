@@ -1,0 +1,3 @@
+Merged coverage of 8 seeds x 2000 random items + the directed phases (results/coverage_summary.txt):
+  named cover points : 17 total, 17 hit, 0 zero
+  axi2apb.v line blocks: 34 total, 34 covered, 0 uncovered
