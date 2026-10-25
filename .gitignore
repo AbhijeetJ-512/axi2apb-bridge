@@ -1,0 +1,6 @@
+# Simulator builds, mutation runs and synthesis output. build/reports/ holds the checked-in synthesis and timing reports and stays tracked.
+build/*
+!build/reports/
+__pycache__/
+*.pyc
+*.vcd
