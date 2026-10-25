@@ -216,7 +216,7 @@ always @(posedge clk) begin
     if(~rst_n)
         S_AXI_BRESP <= 2'b00;
     else if (present_state == PENABLE_WRITE_SIGNAL && M_APB_PREADY)
-        S_AXI_BRESP <= (M_APB_PSLVERR) ? 2'b11 : 2'b00; // '11' for error
+        S_AXI_BRESP <= (M_APB_PSLVERR) ? 2'b10 : 2'b00; // PSLVERR -> SLVERR (2'b10); 2'b11 would be DECERR
 end
 
 // AXI Read Data
@@ -232,7 +232,7 @@ always @(posedge clk) begin
     if(~rst_n)
         S_AXI_RRESP <= 2'b00;
     else if (present_state == PENABLE_READ_SIGNAL && M_APB_PREADY)
-        S_AXI_RRESP <= (M_APB_PSLVERR) ? 2'b11 : 2'b00;
+        S_AXI_RRESP <= (M_APB_PSLVERR) ? 2'b10 : 2'b00;   // PSLVERR -> SLVERR (2'b10)
 end
 
 endmodule
