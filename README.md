@@ -10,6 +10,23 @@ This is the portfolio copy of my `AXI2APB` repository. The original files are ke
 None of the measured results in this README are typed by hand: `scripts/readme_results.py` copies the Results block in from
 `results/`.
 
+
+## Interactive architecture explorer
+
+[![Animated block diagram of axi2apb: click to open the interactive explorer](docs/diagrams/architecture_explorer_preview.svg)](https://abhijeetj-512.github.io/axi2apb-bridge/architecture_explorer.html)
+
+**[Open the interactive explorer](https://abhijeetj-512.github.io/axi2apb-bridge/architecture_explorer.html)** (GitHub Pages). The animation above is a
+preview; the page itself runs read and write transactions through a cycle model of `src/axi2apb.v` one clock at a time, with the
+active wires lit, the FSM state, the sample, address and response registers, the APB slave's wait counter and memory, a transaction
+timeline and an event log. Seven walkthroughs follow a write, a read, APB wait states, an APB error turning into SLVERR, read
+priority, response back-pressure and the checks. Every block has an inspector with the source lines.
+
+The model's per-cycle inputs and outputs for six scenarios (71 cycles) are replayed through the real RTL with Icarus Verilog by
+`docs/explorer_src/validate/run_replay.sh`; every output matches in every cycle, and the same replay against
+`src/original/axi2apb_original.v` fails on the error scenario's BRESP (11 instead of 10). The AXI master and the APB slave on the page are
+re-implemented from the testbench source (the real slave chooses its wait states at random), so they are modelled, not replayed. The page is
+built from `docs/explorer_src/` (`build.py`), and `docs/diagrams/make_explorer_preview.py` regenerates the preview from it.
+
 ## What the bridge does
 
 | | |

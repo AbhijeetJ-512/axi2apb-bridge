@@ -1,0 +1,214 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 740" width="1500" height="740" role="img" aria-label="Block diagram of axi2apb: AXI4-Lite channels, FSM, sample and response registers, APB3 signals, APB slave model and the bound checker">
+<style>
+svg{--bg:#E9EDF1;--surface:#FFFFFF;--surface2:#F3F6F8;--ink:#121B24;--muted:#556574;--line:#C3CDD7;--grid:#D3DBE3;
+ --data:#1B5FC4;--fwd:#B86200;--ctl:#6E3FC4;--trap:#C42F38;--mem:#0F7F55;--ver:#6A7B8C;
+ --b0:#1B5FC4;--b1:#6E3FC4;--b2:#B86200;--b3:#0F7F55;--b4:#A0306F;--b5:#0E7C8C}
+@media (prefers-color-scheme: dark){svg{--bg:#0C1219;--surface:#131B24;--surface2:#18222D;--ink:#E1E8EF;--muted:#8D9BA9;--line:#2B3947;--grid:#1B2631;
+ --data:#5FA3FF;--fwd:#F0A63A;--ctl:#A986F5;--trap:#FF6B70;--mem:#3CCB8E;--ver:#8496A8;
+ --b0:#5FA3FF;--b1:#A986F5;--b2:#F0A63A;--b3:#3CCB8E;--b4:#F07AB8;--b5:#3CC6D6}}
+.bg{fill:var(--bg)} .dot{fill:var(--grid)} .band{fill:var(--surface2);opacity:.6}
+.hd{font:700 16px 'Arial Narrow','Roboto Condensed','Helvetica Neue',Arial,sans-serif;letter-spacing:.04em}
+.box{fill:var(--surface);stroke:var(--line);stroke-width:1.2} .ext .box{fill:var(--surface2);stroke-dasharray:4 3} .ver .box{stroke-dasharray:2 3}
+.nt{font:700 15px 'Arial Narrow','Roboto Condensed','Helvetica Neue',Arial,sans-serif;fill:var(--ink)}
+.ns{font:400 10.5px ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;fill:var(--muted)}
+.nl{font:400 10.5px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:var(--muted)}
+.bar{fill:var(--surface2);stroke:var(--ink);stroke-opacity:.45;stroke-width:1.2}
+.bt{font:600 11px ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;fill:var(--muted);letter-spacing:.08em}
+.bnd{fill:none;stroke:var(--line);stroke-dasharray:6 5;stroke-width:1.2}
+.cap{font:600 11px ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;fill:var(--muted);letter-spacing:.06em}
+.lg{font:400 12px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:var(--muted)}
+.ln{fill:none;stroke-width:1.6}
+.t-data{stroke:var(--data)} .t-fwd{stroke:var(--fwd);stroke-width:2} .t-ctl{stroke:var(--ctl);stroke-dasharray:5 4}
+.t-trap{stroke:var(--trap);stroke-dasharray:7 3} .t-mem{stroke:var(--mem);stroke-width:2} .t-ver{stroke:var(--ver);stroke-dasharray:2 4}
+.p-data{fill:var(--data)} .p-fwd{fill:var(--fwd)} .p-ctl{fill:var(--ctl)} .p-trap{fill:var(--trap)} .p-mem{fill:var(--mem)} .p-ver{fill:var(--ver)}
+.pulse{fill:var(--data);animation:clk 1.7s steps(1,end) infinite}
+@keyframes clk{0%{opacity:0}88%{opacity:.55}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){.pulse{animation:none;opacity:0}}
+</style>
+<defs><pattern id="g" width="16" height="16" patternUnits="userSpaceOnUse"><circle class="dot" cx="1" cy="1" r=".9"/></pattern>
+<marker id="a-data" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="p-data"/></marker>
+<marker id="a-ctl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="p-ctl"/></marker>
+<marker id="a-trap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="p-trap"/></marker>
+<marker id="a-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="p-ver"/></marker>
+</defs>
+<rect class="bg" width="1500" height="740"/><rect width="1500" height="700" fill="url(#g)"/>
+<rect class="band" x="10" y="12" width="340" height="598" rx="4"/>
+<rect x="10" y="12" width="340" height="4" rx="2" fill="var(--b0)"/>
+<text class="hd" x="20" y="40" fill="var(--b0)">AXI4-Lite master (testbench)</text>
+<rect class="band" x="360" y="12" width="770" height="598" rx="4"/>
+<rect x="360" y="12" width="770" height="4" rx="2" fill="var(--b1)"/>
+<text class="hd" x="370" y="40" fill="var(--b1)">axi2apb bridge</text>
+<rect class="band" x="1140" y="12" width="350" height="598" rx="4"/>
+<rect x="1140" y="12" width="350" height="4" rx="2" fill="var(--b2)"/>
+<text class="hd" x="1150" y="40" fill="var(--b2)">APB3 slave model (testbench)</text>
+<rect class="bnd" x="364" y="72" width="762" height="536" rx="6"/>
+<text class="cap" x="1120" y="602" text-anchor="end">axi2apb (src/axi2apb.v)</text>
+<text class="cap" x="1488" y="696" text-anchor="end">testbench + verification (outside the design)</text>
+<path class="ln t-ctl" d="M330 120 L380 120" marker-end="url(#a-ctl)"><title>ARVALID, AWVALID, WVALID</title></path>
+<path class="ln t-data" d="M180 90 L180 72 L890 72 L890 90" marker-end="url(#a-data)"><title>ARADDR / AWADDR</title></path>
+<path class="ln t-data" d="M330 280 L345 280 L345 312 L780 312 L780 300" marker-end="url(#a-data)"><title>WDATA → PWDATA, ARADDR → PADDR</title></path>
+<path class="ln t-ctl" d="M510 290 L510 320" marker-end="url(#a-ctl)"><title>next_state</title></path>
+<path class="ln t-ctl" d="M420 320 L420 290" marker-end="url(#a-ctl)"><title>present_state</title></path>
+<path class="ln t-ctl" d="M510 400 L510 430" marker-end="url(#a-ctl)"><title>present_state</title></path>
+<path class="ln t-ctl" d="M380 455 L360 455 L360 230 L330 230" marker-end="url(#a-ctl)"><title>ARREADY, AWREADY, WREADY</title></path>
+<path class="ln t-ctl" d="M380 500 L330 500" marker-end="url(#a-ctl)"><title>BVALID, RVALID</title></path>
+<path class="ln t-ctl" d="M330 400 L374 400 L374 250 L380 250" marker-end="url(#a-ctl)"><title>BREADY, RREADY</title></path>
+<path class="ln t-data" d="M890 180 L890 210" marker-end="url(#a-data)"><title>sampled_addr → PADDR</title></path>
+<path class="ln t-ctl" d="M640 360 L680 360" marker-end="url(#a-ctl)"><title>present_state: capture at end of access</title></path>
+<path class="ln t-ctl" d="M640 345 L664 345 L664 270 L680 270" marker-end="url(#a-ctl)"><title>present_state: load PADDR / PWDATA</title></path>
+<path class="ln t-ctl" d="M640 330 L652 330 L652 150 L680 150" marker-end="url(#a-ctl)"><title>present_state == IDLE: sample address</title></path>
+<path class="ln t-ctl" d="M640 550 L655 550 L655 575 L1126 575 L1126 130 L1160 130" marker-end="url(#a-ctl)"><title>PSEL, PENABLE, PWRITE</title></path>
+<path class="ln t-data" d="M1100 250 L1160 250" marker-end="url(#a-data)"><title>PADDR, PWDATA</title></path>
+<path class="ln t-data" d="M1100 290 L1112 290 L1112 380 L1160 380" marker-end="url(#a-data)"><title>PADDR[11:8]</title></path>
+<path class="ln t-ctl" d="M1315 90 L1315 80 L510 80 L510 90" marker-end="url(#a-ctl)"><title>PREADY</title></path>
+<path class="ln t-ctl" d="M1250 180 L1250 210" marker-end="url(#a-ctl)"><title>access &amp;&amp; pready: write strobe</title></path>
+<path class="ln t-ctl" d="M1400 340 L1400 310" marker-end="url(#a-ctl)"><title>err_reg: block write, poison read</title></path>
+<path class="ln t-ctl" d="M1470 135 L1484 135 L1484 385 L1470 385" marker-end="url(#a-ctl)"><title>pready</title></path>
+<path class="ln t-data" d="M1160 292 L1136 292 L1136 365 L1100 365" marker-end="url(#a-data)"><title>PRDATA</title></path>
+<path class="ln t-trap" d="M1160 410 L1100 410" marker-end="url(#a-trap)"><title>PSLVERR</title></path>
+<path class="ln t-data" d="M760 440 L760 592 L352 592 L352 470 L330 470" marker-end="url(#a-data)"><title>BRESP, RRESP, RDATA</title></path>
+<path class="ln t-ver" d="M100 520 L100 540" marker-end="url(#a-ver)"><title>responses checked</title></path>
+<path class="ln t-ver" d="M450 622 L450 560" marker-end="url(#a-ver)"><title>observes APB and AXI outputs</title></path>
+<path class="ln t-ver" d="M1060 622 L1060 440" marker-end="url(#a-ver)"><title>response mapping rules</title></path>
+<path class="ln t-ctl" d="M1160 165 L1148 165 L1148 345 L1100 345" marker-end="url(#a-ctl)"><title>PREADY qualifies the capture</title></path>
+<circle r="3.2" class="p-ctl"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M330 120 L380 120"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="10.66s" begin="-0.00s" repeatCount="indefinite" path="M180 90 L180 72 L890 72 L890 90"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="10.66s" begin="-2.66s" repeatCount="indefinite" path="M180 90 L180 72 L890 72 L890 90"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="10.66s" begin="-5.33s" repeatCount="indefinite" path="M180 90 L180 72 L890 72 L890 90"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="10.66s" begin="-7.99s" repeatCount="indefinite" path="M180 90 L180 72 L890 72 L890 90"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="7.06s" begin="-0.00s" repeatCount="indefinite" path="M330 280 L345 280 L345 312 L780 312 L780 300"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="7.06s" begin="-2.35s" repeatCount="indefinite" path="M330 280 L345 280 L345 312 L780 312 L780 300"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="7.06s" begin="-4.70s" repeatCount="indefinite" path="M330 280 L345 280 L345 312 L780 312 L780 300"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M510 290 L510 320"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M420 320 L420 290"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M510 400 L510 430"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="3.93s" begin="-0.00s" repeatCount="indefinite" path="M380 455 L360 455 L360 230 L330 230"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="3.93s" begin="-1.96s" repeatCount="indefinite" path="M380 455 L360 455 L360 230 L330 230"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M380 500 L330 500"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="2.86s" begin="-0.00s" repeatCount="indefinite" path="M330 400 L374 400 L374 250 L380 250"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M890 180 L890 210"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M640 360 L680 360"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="1.64s" begin="-0.00s" repeatCount="indefinite" path="M640 345 L664 345 L664 270 L680 270"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="3.14s" begin="-0.00s" repeatCount="indefinite" path="M640 330 L652 330 L652 150 L680 150"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="14.14s" begin="-0.00s" repeatCount="indefinite" path="M640 550 L655 550 L655 575 L1126 575 L1126 130 L1160 130"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="14.14s" begin="-2.36s" repeatCount="indefinite" path="M640 550 L655 550 L655 575 L1126 575 L1126 130 L1160 130"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="14.14s" begin="-4.71s" repeatCount="indefinite" path="M640 550 L655 550 L655 575 L1126 575 L1126 130 L1160 130"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="14.14s" begin="-7.07s" repeatCount="indefinite" path="M640 550 L655 550 L655 575 L1126 575 L1126 130 L1160 130"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="14.14s" begin="-9.43s" repeatCount="indefinite" path="M640 550 L655 550 L655 575 L1126 575 L1126 130 L1160 130"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="14.14s" begin="-11.79s" repeatCount="indefinite" path="M640 550 L655 550 L655 575 L1126 575 L1126 130 L1160 130"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M1100 250 L1160 250"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="2.14s" begin="-0.00s" repeatCount="indefinite" path="M1100 290 L1112 290 L1112 380 L1160 380"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="11.79s" begin="-0.00s" repeatCount="indefinite" path="M1315 90 L1315 80 L510 80 L510 90"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="11.79s" begin="-2.36s" repeatCount="indefinite" path="M1315 90 L1315 80 L510 80 L510 90"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="11.79s" begin="-4.71s" repeatCount="indefinite" path="M1315 90 L1315 80 L510 80 L510 90"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="11.79s" begin="-7.07s" repeatCount="indefinite" path="M1315 90 L1315 80 L510 80 L510 90"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="11.79s" begin="-9.43s" repeatCount="indefinite" path="M1315 90 L1315 80 L510 80 L510 90"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M1250 180 L1250 210"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M1400 340 L1400 310"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="3.97s" begin="-0.00s" repeatCount="indefinite" path="M1470 135 L1484 135 L1484 385 L1470 385"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="3.97s" begin="-1.99s" repeatCount="indefinite" path="M1470 135 L1484 135 L1484 385 L1470 385"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="1.90s" begin="-0.00s" repeatCount="indefinite" path="M1160 292 L1136 292 L1136 365 L1100 365"/></circle>
+<circle r="3.2" class="p-trap"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M1160 410 L1100 410"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="10.06s" begin="-0.00s" repeatCount="indefinite" path="M760 440 L760 592 L352 592 L352 470 L330 470"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="10.06s" begin="-2.51s" repeatCount="indefinite" path="M760 440 L760 592 L352 592 L352 470 L330 470"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="10.06s" begin="-5.03s" repeatCount="indefinite" path="M760 440 L760 592 L352 592 L352 470 L330 470"/></circle>
+<circle r="3.2" class="p-data"><animateMotion dur="10.06s" begin="-7.54s" repeatCount="indefinite" path="M760 440 L760 592 L352 592 L352 470 L330 470"/></circle>
+<circle r="3.2" class="p-ver"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M100 520 L100 540"/></circle>
+<circle r="3.2" class="p-ver"><animateMotion dur="1.20s" begin="-0.00s" repeatCount="indefinite" path="M450 622 L450 560"/></circle>
+<circle r="3.2" class="p-ver"><animateMotion dur="2.60s" begin="-0.00s" repeatCount="indefinite" path="M1060 622 L1060 440"/></circle>
+<circle r="3.2" class="p-ctl"><animateMotion dur="3.43s" begin="-0.00s" repeatCount="indefinite" path="M1160 165 L1148 165 L1148 345 L1100 345"/></circle>
+<g class="n ext"><rect class="box" x="30" y="90" width="300" height="200" rx="5"/>
+<text class="nt" x="40" y="109">Request channels</text>
+<text class="ns" x="40" y="124">AR · AW · W (master → bridge)</text>
+<text class="nl" x="40" y="138">AR  ARADDR  ARVALID  ARREADY</text>
+<text class="nl" x="40" y="152">AW  AWADDR  AWVALID  AWREADY</text>
+<text class="nl" x="40" y="166">W   WDATA   WVALID   WREADY</text>
+</g>
+<g class="n ext"><rect class="box" x="30" y="380" width="300" height="140" rx="5"/>
+<text class="nt" x="40" y="399">Response channels</text>
+<text class="ns" x="40" y="414">B · R (bridge → master)</text>
+<text class="nl" x="40" y="428">B   BRESP  BVALID  BREADY</text>
+<text class="nl" x="40" y="442">R   RDATA  RRESP  RVALID  RREADY</text>
+</g>
+<g class="n ext ver"><rect class="box" x="30" y="540" width="300" height="60" rx="5"/>
+<text class="nt" x="40" y="559">Scoreboard</text>
+<text class="ns" x="40" y="574">tb_axi2apb · 64-word ref_mem</text>
+<text class="nl" x="40" y="588">every read returns the last value written</text>
+</g>
+<g class="n"><rect class="box" x="380" y="90" width="260" height="200" rx="5"/>
+<text class="nt" x="390" y="109">Next-state logic</text>
+<text class="ns" x="390" y="124">always @(*) · next_state logic</text>
+<text class="nl" x="390" y="138">IDLE: ARVALID › AWVALID (read wins)</text>
+<text class="nl" x="390" y="152">WA: WVALID → WD</text>
+<text class="nl" x="390" y="166">WD: always → PW</text>
+<text class="nl" x="390" y="180">PW: PREADY → WT</text>
+<text class="nl" x="390" y="194">WT: BREADY → IDLE</text>
+<text class="nl" x="390" y="208">RA: always → PR</text>
+<text class="nl" x="390" y="222">PR: PREADY → RT</text>
+<text class="nl" x="390" y="236">RT: RREADY → IDLE</text>
+</g>
+<g class="n"><rect class="box" x="380" y="320" width="260" height="80" rx="5"/>
+<text class="nt" x="390" y="339">FSM state</text>
+<text class="ns" x="390" y="354">present_state [2:0]</text>
+<text class="nl" x="390" y="368">resets to IDLE (3&#x27;b000)</text>
+</g>
+<g class="n"><rect class="box" x="380" y="430" width="260" height="130" rx="5"/>
+<text class="nt" x="390" y="449">Output decode</text>
+<text class="ns" x="390" y="464">always @(*) · Moore outputs</text>
+<text class="nl" x="390" y="478">WA: AWREADY, WREADY</text>
+<text class="nl" x="390" y="492">WD: PSEL, PWRITE   PW: + PENABLE</text>
+<text class="nl" x="390" y="506">WT: BVALID   RT: RVALID</text>
+<text class="nl" x="390" y="520">RA: ARREADY, PSEL   PR: + PENABLE</text>
+</g>
+<g class="n"><rect class="box" x="680" y="90" width="420" height="90" rx="5"/>
+<text class="nt" x="690" y="109">Sample registers</text>
+<text class="ns" x="690" y="124">sampled_addr · sampled_wdata</text>
+<text class="nl" x="690" y="138">address latched in IDLE (ARADDR wins)</text>
+<text class="nl" x="690" y="152">sampled_wdata is unused downstream</text>
+</g>
+<g class="n"><rect class="box" x="680" y="210" width="420" height="90" rx="5"/>
+<text class="nt" x="690" y="229">APB address / data</text>
+<text class="ns" x="690" y="244">M_APB_PADDR · M_APB_PWDATA</text>
+<text class="nl" x="690" y="258">write: PADDR ← sampled_addr, PWDATA ← WDATA</text>
+<text class="nl" x="690" y="272">read: PADDR ← ARADDR in IDLE</text>
+</g>
+<g class="n"><rect class="box" x="680" y="330" width="420" height="110" rx="5"/>
+<text class="nt" x="690" y="349">Response registers</text>
+<text class="ns" x="690" y="364">BRESP · RRESP · RDATA</text>
+<text class="nl" x="690" y="378">captured when PREADY ends the access phase</text>
+<text class="nl" x="690" y="392">PSLVERR → 2&#x27;b10 (SLVERR), else 2&#x27;b00</text>
+<text class="nl" x="690" y="406">RDATA only captured without PSLVERR</text>
+</g>
+<g class="n ext ver"><rect class="box" x="380" y="622" width="720" height="66" rx="5"/>
+<text class="nt" x="390" y="641">axi2apb_checker (bind)</text>
+<text class="ns" x="390" y="656">verif/axi2apb_checker.sv · bound by name</text>
+<text class="nl" x="390" y="670">APB3 rules · AXI channel rules · response mapping · arbitration · 17 cover points</text>
+</g>
+<g class="n ext"><rect class="box" x="1160" y="90" width="310" height="90" rx="5"/>
+<text class="nt" x="1170" y="109">Wait-state counter</text>
+<text class="ns" x="1170" y="124">apb_slave_model · cnt, pready</text>
+<text class="nl" x="1170" y="138">loaded in setup, counts down in access</text>
+<text class="nl" x="1170" y="152">pready = access &amp;&amp; cnt == 0</text>
+</g>
+<g class="n ext"><rect class="box" x="1160" y="210" width="310" height="100" rx="5"/>
+<text class="nt" x="1170" y="229">Memory</text>
+<text class="ns" x="1170" y="244">apb_slave_model · 64 × 32</text>
+<text class="nl" x="1170" y="258">word index = paddr[7:2]</text>
+<text class="nl" x="1170" y="272">write on access &amp;&amp; pready &amp;&amp; pwrite &amp;&amp; !err</text>
+</g>
+<g class="n ext"><rect class="box" x="1160" y="340" width="310" height="90" rx="5"/>
+<text class="nt" x="1170" y="359">Error region</text>
+<text class="ns" x="1170" y="374">apb_slave_model · paddr[11:8] == 4&#x27;hF</text>
+<text class="nl" x="1170" y="388">PSLVERR with the access completed</text>
+<text class="nl" x="1170" y="402">no memory change, read data 0xBAD0BAD0</text>
+</g>
+<path class="ln t-data" d="M16 720 L42 720" marker-end="url(#a-data)"/>
+<text class="lg" x="50" y="724">Address / data</text>
+<path class="ln t-ctl" d="M152 720 L178 720" marker-end="url(#a-ctl)"/>
+<text class="lg" x="186" y="724">Handshake &amp; control</text>
+<path class="ln t-trap" d="M321 720 L347 720" marker-end="url(#a-trap)"/>
+<text class="lg" x="355" y="724">Error response (PSLVERR → SLVERR)</text>
+<path class="ln t-ver" d="M582 720 L608 720" marker-end="url(#a-ver)"/>
+<text class="lg" x="616" y="724">Verification only</text>
+<text class="lg" x="1488" y="724" text-anchor="end">Open the interactive explorer to run scenarios through the design</text>
+</svg>
