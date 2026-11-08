@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AXI4-Lite to APB3 Bridge Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: drafting-table schematic. Diagram canvas left, inspector rail right, timing / state sheets below. */
+:root{
+  color-scheme:light;
+  --bg:#E9EDF1; --surface:#FFFFFF; --surface-2:#F3F6F8; --ink:#121B24; --muted:#556574; --line:#C3CDD7; --grid:#D3DBE3;
+  --accent:#1B5FC4; --accent-ink:#FFFFFF;
+  --data:#1B5FC4; --fwd:#B86200; --ctl:#6E3FC4; --trap:#C42F38; --mem:#0F7F55; --ver:#6A7B8C;
+  --b0:#1B5FC4; --b1:#6E3FC4; --b2:#B86200; --b3:#0F7F55; --b4:#A0306F; --b5:#0E7C8C;
+  --t0:#1B5FC4; --t1:#B86200; --t2:#0F7F55; --t3:#A0306F; --t4:#6E3FC4; --t5:#0E7C8C; --t6:#8A6A00; --t7:#C42F38;
+  --hatch:rgba(110,63,196,.16);
+  --f-display:"Saira Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0C1219; --surface:#131B24; --surface-2:#18222D; --ink:#E1E8EF; --muted:#8D9BA9; --line:#2B3947; --grid:#1B2631;
+  --accent:#5FA3FF; --accent-ink:#06121F;
+  --data:#5FA3FF; --fwd:#F0A63A; --ctl:#A986F5; --trap:#FF6B70; --mem:#3CCB8E; --ver:#8496A8;
+  --b0:#5FA3FF; --b1:#A986F5; --b2:#F0A63A; --b3:#3CCB8E; --b4:#F07AB8; --b5:#3CC6D6;
+  --t0:#5FA3FF; --t1:#F0A63A; --t2:#3CCB8E; --t3:#F07AB8; --t4:#A986F5; --t5:#3CC6D6; --t6:#E3C04A; --t7:#FF6B70;
+  --hatch:rgba(169,134,245,.22); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0C1219; --surface:#131B24; --surface-2:#18222D; --ink:#E1E8EF; --muted:#8D9BA9; --line:#2B3947; --grid:#1B2631;
+  --accent:#5FA3FF; --accent-ink:#06121F;
+  --data:#5FA3FF; --fwd:#F0A63A; --ctl:#A986F5; --trap:#FF6B70; --mem:#3CCB8E; --ver:#8496A8;
+  --b0:#5FA3FF; --b1:#A986F5; --b2:#F0A63A; --b3:#3CCB8E; --b4:#F07AB8; --b5:#3CC6D6;
+  --t0:#5FA3FF; --t1:#F0A63A; --t2:#3CCB8E; --t3:#F07AB8; --t4:#A986F5; --t5:#3CC6D6; --t6:#E3C04A; --t7:#FF6B70;
+  --hatch:rgba(169,134,245,.22); color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;letter-spacing:.01em;text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,3.2vw,40px);line-height:1.05} h2{font-size:20px} h3{font-size:16px}
+p{margin:0}
+code,.mono{font-family:var(--f-mono);font-size:12px}
+a{color:var(--accent)}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:78ch}
+header.top{display:flex;flex-wrap:wrap;gap:12px 32px;align-items:flex-end;justify-content:space-between}
+header.top .ttl{display:flex;flex-direction:column;gap:6px;min-width:0}
+.specs{display:flex;flex-wrap:wrap;gap:6px}
+.spec{font-family:var(--f-mono);font-size:11px;padding:3px 8px;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--muted)}
+.spec b{color:var(--ink);font-weight:600}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:6px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.tabs{display:flex;gap:2px;background:var(--surface-2);padding:3px;border-radius:5px;border:1px solid var(--line)}
+.tabs button{font:600 13px var(--f-body);border:0;background:transparent;color:var(--muted);padding:6px 12px;border-radius:3px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.transport{display:flex;gap:6px;align-items:center}
+.btn{font:500 13px var(--f-body);display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 10px;border-radius:4px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn svg{width:14px;height:14px;fill:currentColor}
+button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.speed{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.speed input{width:120px;accent-color:var(--accent)}
+.speed output{font-family:var(--f-mono);color:var(--ink);min-width:3.5em}
+.cyc{margin-left:auto;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.cyc b{color:var(--ink);font-size:15px;margin-left:6px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:16px;align-items:start}
+@media (max-width:1100px){.main{grid-template-columns:minmax(0,1fr)}}
+.canvas{background:var(--surface);border:1px solid var(--line);border-radius:6px;min-width:0;display:flex;flex-direction:column}
+.scroll{overflow-x:auto;overflow-y:hidden}
+#diagram{display:block;width:100%;min-width:1080px;height:auto;user-select:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);align-items:center}
+.legend .lg{display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:0;background:none;color:inherit;font:inherit;padding:2px 4px;border-radius:3px}
+.legend .lg[aria-pressed="false"]{opacity:.35;text-decoration:line-through}
+.legend svg{width:30px;height:10px}
+.legend .note{margin-left:auto;font-size:11px}
+.band{fill:var(--surface-2)}
+.bandlbl{font:700 15px var(--f-display);letter-spacing:.04em}
+.occ{font:500 11px var(--f-mono);fill:var(--muted)}
+.occ.live{fill:var(--ink)}
+.boundary{fill:none;stroke:var(--line);stroke-dasharray:6 5;stroke-width:1.2}
+.boundlbl{font:600 11px var(--f-mono);fill:var(--muted);letter-spacing:.06em}
+.node rect.box{fill:var(--surface);stroke:var(--line);stroke-width:1.2;transition:stroke .2s,fill .2s}
+.node{cursor:pointer}
+.node:hover rect.box{stroke:var(--accent)}
+.node .nt{font:700 14.5px var(--f-display);fill:var(--ink);letter-spacing:.02em}
+.node .ns{font:400 10.5px var(--f-mono);fill:var(--muted)}
+.node .nl{font:400 10.5px var(--f-body);fill:var(--muted)}
+.node .nv{font:600 11px var(--f-mono);fill:var(--accent)}
+.node.ext rect.box{fill:var(--surface-2);stroke-dasharray:4 3}
+.node.ver rect.box{stroke-dasharray:2 3}
+.node.sel rect.box{stroke:var(--accent);stroke-width:2.4}
+.node.live rect.box{stroke:var(--accent);stroke-width:1.8}
+.node.trapped rect.box{stroke:var(--trap);stroke-width:2.4}
+.node.stalled rect.box{stroke:var(--ctl);stroke-width:2.4}
+.bar rect.reg{fill:var(--surface-2);stroke:var(--ink);stroke-opacity:.45;stroke-width:1.2;cursor:pointer;transition:fill .25s}
+.bar.pulse rect.reg{fill:var(--accent)}
+.bar text{font:600 11px var(--f-mono);fill:var(--muted);letter-spacing:.08em;pointer-events:none}
+.bar.pulse text{fill:var(--accent-ink)}
+.bar.flushed rect.reg{stroke:var(--trap);stroke-opacity:1;stroke-width:2}
+.bar.held rect.reg{stroke:var(--ctl);stroke-opacity:1;stroke-width:2}
+.edge path.ln{fill:none;stroke-width:1.6;transition:opacity .25s,stroke-width .2s}
+.edge path.hit{fill:none;stroke:transparent;stroke-width:12;cursor:pointer}
+.edge.t-data path.ln{stroke:var(--data)}
+.edge.t-fwd path.ln{stroke:var(--fwd);stroke-width:2}
+.edge.t-ctl path.ln{stroke:var(--ctl);stroke-dasharray:5 4}
+.edge.t-trap path.ln{stroke:var(--trap);stroke-dasharray:7 3}
+.edge.t-mem path.ln{stroke:var(--mem);stroke-width:2}
+.edge.t-ver path.ln{stroke:var(--ver);stroke-dasharray:2 4}
+.edge.on path.ln{stroke-width:2.8}
+.edge.hidden{display:none}
+.elbl{font:500 10.5px var(--f-mono);pointer-events:none}
+.elbl rect{fill:var(--surface);stroke:var(--line)}
+.elbl text{fill:var(--ink)}
+svg.focus .edge:not(.on) path.ln{opacity:.12}
+svg.focus .node:not(.on):not(.sel){opacity:.38}
+svg.focus .bar:not(.on){opacity:.5}
+.p-data{fill:var(--data)} .p-fwd{fill:var(--fwd)} .p-ctl{fill:var(--ctl)} .p-trap{fill:var(--trap)} .p-mem{fill:var(--mem)} .p-ver{fill:var(--ver)}
+.mk-data{fill:var(--data)} .mk-fwd{fill:var(--fwd)} .mk-ctl{fill:var(--ctl)} .mk-trap{fill:var(--trap)} .mk-mem{fill:var(--mem)} .mk-ver{fill:var(--ver)}
+.dotgrid{fill:var(--grid)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;min-width:0;max-height:calc(100vh - 110px);position:sticky;top:calc(env(safe-area-inset-top,0px) + 66px)}
+@media (max-width:1100px){.panel{position:static;max-height:none}}
+.panel .pscroll{overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px}
+.insp{border:1px solid var(--accent);border-radius:5px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--surface-2)}
+.insp .ih{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.insp .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:2px 4px}
+.kv{display:grid;grid-template-columns:88px minmax(0,1fr);gap:4px 10px;font-size:12.5px}
+.kv dt{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.kv dd{margin:0;min-width:0}
+.kv ul{margin:0;padding-left:16px}
+pre.code{margin:0;font:400 11px/1.45 var(--f-mono);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:8px 10px;overflow-x:auto;white-space:pre;color:var(--ink)}
+.file{font-family:var(--f-mono);font-size:11px;color:var(--accent)}
+.sec{display:flex;flex-direction:column;gap:8px}
+.muted{color:var(--muted)} .small{font-size:12px}
+.pathlist{display:flex;flex-direction:column;gap:10px}
+.pgroup{display:flex;flex-direction:column;gap:4px}
+.pgroup .gl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.pbtn{text-align:left;font:500 13px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 9px;border-radius:4px;cursor:pointer}
+.pbtn[aria-pressed="true"]{border-color:var(--accent);background:var(--surface-2);box-shadow:inset 3px 0 0 var(--accent)}
+ol.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+ol.steps li{cursor:pointer;color:var(--muted);padding:2px 4px;border-radius:3px}
+ol.steps li.done{color:var(--ink)}
+ol.steps li.cur{color:var(--ink);background:var(--surface-2);outline:1px solid var(--accent)}
+.caption{font-size:13px;padding:10px 12px;border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 4px 4px 0;min-height:3.2em}
+select{font:500 13px var(--f-body);padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);max-width:100%}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.seg button{font:600 12px var(--f-mono);border:0;background:var(--surface);color:var(--muted);padding:5px 10px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font:500 11px var(--f-mono);padding:2px 7px;border-radius:10px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+.chip.on.c-ctl{background:var(--ctl);border-color:var(--ctl);color:var(--surface)}
+.chip.on.c-fwd{background:var(--fwd);border-color:var(--fwd);color:var(--surface)}
+.chip.on.c-trap{background:var(--trap);border-color:var(--trap);color:var(--surface)}
+.chip.on.c-mem{background:var(--mem);border-color:var(--mem);color:var(--surface)}
+.chip.on.c-data{background:var(--data);border-color:var(--data);color:var(--surface)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.stat{border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--surface-2)}
+.stat .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.stat .v{font:600 16px var(--f-mono);font-variant-numeric:tabular-nums}
+.listing{font:400 11.5px/1.6 var(--f-mono);border:1px solid var(--line);border-radius:4px;overflow:auto;max-height:280px}
+.listing .ln{display:grid;grid-template-columns:34px minmax(0,1fr);gap:6px;padding:0 8px;white-space:pre;cursor:pointer}
+.listing .ln:hover{background:var(--surface-2)}
+.listing .ln.sel{background:var(--surface-2);box-shadow:inset 3px 0 0 var(--accent)}
+.listing .stg{font-weight:600;font-size:10px;border-radius:2px;text-align:center;color:var(--surface);align-self:center;line-height:1.5}
+.listing .cm{color:var(--muted)}
+.journey{display:flex;flex-direction:column;gap:4px;font-size:12px}
+.journey .j{display:grid;grid-template-columns:40px 30px minmax(0,1fr);gap:6px;align-items:baseline}
+.journey .j .c{font-family:var(--f-mono);color:var(--muted);font-size:11px}
+.journey .j .s{font:600 10.5px var(--f-mono);text-align:center;border-radius:2px;color:var(--surface)}
+.sheets{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px}
+@media (max-width:1100px){.sheets{grid-template-columns:minmax(0,1fr)}}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.sheet .sh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.chartwrap{overflow:auto;max-height:420px;border:1px solid var(--line);border-radius:4px}
+table.pc{border-collapse:separate;border-spacing:0;font:500 11px var(--f-mono);font-variant-numeric:tabular-nums}
+table.pc th,table.pc td{padding:0;height:22px;min-width:26px;text-align:center;border-right:1px solid var(--grid);border-bottom:1px solid var(--grid)}
+table.pc thead th{position:sticky;top:0;background:var(--surface-2);color:var(--muted);z-index:2;font-weight:500}
+table.pc th.ins{position:sticky;left:0;background:var(--surface);text-align:left;padding:0 10px 0 8px;min-width:210px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:1;cursor:pointer;font-weight:500;color:var(--ink)}
+table.pc thead th.ins{z-index:3;background:var(--surface-2);color:var(--muted);cursor:default}
+table.pc tr.sel th.ins{box-shadow:inset 3px 0 0 var(--accent);background:var(--surface-2)}
+table.pc td.cur{background:var(--surface-2)}
+table.pc td .cell{display:block;margin:2px;border-radius:2px;line-height:18px;color:var(--surface);font-weight:600;font-size:10px;white-space:nowrap;overflow:hidden}
+table.pc td .cell.st{background:repeating-linear-gradient(135deg,var(--hatch) 0 4px,transparent 4px 8px)!important;color:var(--ctl);outline:1px solid var(--ctl)}
+table.pc td .cell.sq{background:transparent!important;color:var(--trap);outline:1px dashed var(--trap)}
+table.pc tr.squashed th.ins{color:var(--muted);text-decoration:line-through}
+.state{display:flex;flex-direction:column;gap:8px}
+.regs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px;font:400 11.5px var(--f-mono)}
+.reg{display:flex;justify-content:space-between;gap:6px;padding:3px 7px;border:1px solid var(--line);border-radius:3px;background:var(--surface-2);min-width:0}
+.reg .r{color:var(--muted)} .reg .v{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reg.chg{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.reg.hot{border-color:var(--fwd)}
+.log{font:400 11.5px/1.55 var(--f-mono);border:1px solid var(--line);border-radius:4px;padding:6px 8px;max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+.log .e{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px}
+.log .e .c{color:var(--muted)}
+.log .e.k-trap{color:var(--trap)} .log .e.k-ctl{color:var(--ctl)} .log .e.k-fwd{color:var(--fwd)} .log .e.k-ret{color:var(--ink)} .log .e.k-mem{color:var(--mem)} .log .e.k-data{color:var(--data)} .log .e.k-info{color:var(--muted)}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.notes .sheet p,.notes .sheet li{font-size:13px;color:var(--muted)}
+.notes ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.fig{border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--surface-2);min-width:0}
+.fig .k{font-size:11px;color:var(--muted)} .fig .v{font:600 15px var(--f-mono);font-variant-numeric:tabular-nums} .fig .s{font:400 10.5px var(--f-mono);color:var(--muted)}
+#tip{position:fixed;pointer-events:none;z-index:20;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:6px 9px;font-size:12px;max-width:320px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+#tip b{font-family:var(--f-mono);font-size:11.5px}
+[data-mode-only]{display:none}
+body[data-mode="sim"] [data-mode-only~="sim"],body[data-mode="path"] [data-mode-only~="path"],body[data-mode="explore"] [data-mode-only~="explore"]{display:flex}
+footer.foot{font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){ .node rect.box,.bar rect.reg,.edge path.ln{transition:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="ttl">
+      <span class="eyebrow" id="m-eyebrow"></span>
+      <h1 id="m-title"></h1>
+      <p class="lede" id="m-lede"></p>
+    </div>
+    <div class="specs" id="m-specs" aria-label="Parameters"></div>
+  </header>
+  <div class="toolbar" role="toolbar" aria-label="View and animation controls">
+    <div class="tabs" role="tablist" aria-label="Mode">
+      <button role="tab" data-mode="sim" aria-selected="true" id="tab-sim">Run a scenario</button>
+      <button role="tab" data-mode="path" aria-selected="false">Trace a path</button>
+      <button role="tab" data-mode="explore" aria-selected="false">Explore</button>
+    </div>
+    <div class="transport">
+      <button class="btn primary" id="btn-play" aria-label="Pause"><svg viewBox="0 0 16 16" id="ico-play"><rect x="3" y="2" width="3.5" height="12"/><rect x="9.5" y="2" width="3.5" height="12"/></svg><span id="lbl-play">Pause</span></button>
+      <button class="btn" id="btn-step" title="Step (→)"><svg viewBox="0 0 16 16"><path d="M2 2l8 6-8 6z"/><rect x="11" y="2" width="3" height="12"/></svg>Step</button>
+      <button class="btn" id="btn-restart" title="Restart"><svg viewBox="0 0 16 16"><path d="M8 2a6 6 0 1 1-5.7 4.1l1.9.6A4 4 0 1 0 8 4v2.5L4.5 3 8 0z"/></svg>Restart</button>
+    </div>
+    <label class="speed" for="speed">Speed <input type="range" id="speed" min="-2" max="2" step="0.25" value="0"><output id="speed-out">1.00×</output></label>
+    <div class="cyc" data-mode-only="sim">cycle <b id="cyc-n">0</b></div>
+  </div>
+  <div class="main">
+    <section class="canvas" aria-label="Block diagram">
+      <div class="scroll"><svg id="diagram" role="img"></svg></div>
+      <div class="legend" id="legend"></div>
+    </section>
+    <aside class="panel" aria-label="Details">
+      <div class="pscroll" id="panel">
+        <div id="insp-slot"></div>
+        <div class="sec" data-mode-only="sim" style="flex-direction:column">
+          <h3 id="sim-h">Scenario</h3>
+          <div class="row"><select id="scenario" aria-label="Scenario"></select></div>
+          <div id="opts" class="sec"></div>
+          <p class="small muted" id="scen-desc"></p>
+          <div class="stats" id="stats"></div>
+          <div class="chips" id="sigchips" aria-label="Signals this cycle"></div>
+          <div class="listing" id="listing" aria-label="Transactions"></div>
+          <div class="sec"><h3>Journey</h3><p class="small muted" id="journey-hint">Click a line in the list above or a row in the chart to follow one item through the design.</p><div class="journey" id="journey"></div></div>
+        </div>
+        <div class="sec" data-mode-only="path" style="flex-direction:column">
+          <h3>Pick a path</h3>
+          <div class="pathlist" id="pathlist"></div>
+          <div class="caption" id="caption" aria-live="polite"></div>
+          <ol class="steps" id="steps"></ol>
+        </div>
+        <div class="sec" data-mode-only="explore" style="flex-direction:column">
+          <h3>Blocks</h3>
+          <p class="small muted">All wires flow continuously. Click a block or a wire for its detail; click a legend entry to hide that kind of connection.</p>
+          <div class="pathlist" id="modlist"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <div class="sheets" data-mode-only="sim">
+    <section class="sheet">
+      <div class="sh"><h2 id="chart-h">Timeline</h2><span class="small muted" id="chart-hint"></span></div>
+      <div class="chartwrap" id="chartwrap"><table class="pc" id="chart"></table></div>
+    </section>
+    <section class="sheet">
+      <div class="sh"><h2>State</h2><span class="small muted">after the last clock edge</span></div>
+      <div class="state" id="state"></div>
+      <div class="sh"><h3>Event log</h3><span class="small muted">newest first</span></div>
+      <div class="log" id="log"></div>
+    </section>
+  </div>
+  <div class="notes" id="notes"></div>
+  <footer class="foot" id="foot"></footer>
+</div>
+<div id="tip" hidden></div>
+
+<script>
+// ===================================================================================== project configuration
+const DATA={"META":{"pageTitle":"AXI4-Lite to APB3 Bridge Explorer","title":"AXI4-Lite to APB3 Bridge Explorer","eyebrow":"axi2apb_bridge · src/axi2apb.v · verif/ · derived from the RTL and testbench","lede":"Every block, wire and rule below comes from the RTL. Run read and write transactions through a cycle-accurate model of the bridge FSM, trace one transaction from the AXI handshake to the APB access and back, or click any block to see what it does and where it lives in the source.","specs":[["slave side","AXI4-Lite",""],["master side","APB3",""],["FSM","8 states",""],["outstanding","1",""],["DATA_WIDTH / ADDR_WIDTH","32 / 32",""],["PSLVERR →","SLVERR 2'b10",""]],"runLabel":"Run a transaction","scenarioLabel":"Scenario","diagramLabel":"Block diagram of axi2apb: AXI4-Lite channels, FSM, sample and response registers, APB3 signals, APB slave model and the bound checker","barLegend":"Register (posedge clk)","notes":[{"h":"How to read the wires","items":["The bridge is one clocked FSM. The state register and the sample, address, data and response registers update on the rising edge; the next-state logic and the output decode are combinational (Moore: outputs depend on the state only).","A dashed purple wire is a control or handshake signal, a solid blue wire carries an address or data value, red is the error response path, grey dotted wires are verification only.","There is no asynchronous channel, no FIFO and no retry. One transaction is in flight at a time; every wait is a state that stays put until a ready signal arrives (PREADY, BREADY or RREADY).","Reads win over writes when both are requested in IDLE (<code>if (S_AXI_ARVALID) … else if (S_AXI_AWVALID)<\/code>).","The APB slave and the AXI master are testbench models, not part of the design; the dashed boxes mark them."]}],"figuresTitle":"Measured results from results/","figures":[{"k":"Regression","v":"8 / 8 seeds","s":"3000 random items each · regression.txt"},{"k":"Cover points","v":"17 / 17","s":"34 / 34 line blocks · coverage_summary.txt"},{"k":"Injected bugs caught","v":"14 / 15","s":"B14 is an equivalent mutant · mutants.txt"},{"k":"As-found RTL","v":"765 errors","s":"in 4983 checks (BRESP/RRESP 11, fixed to 10)"},{"k":"T_min, speed mapping","v":"1.681 ns","s":"594.9 MHz · Sky130 HD · ppa.md"},{"k":"Area","v":"5378 µm²","s":"595 cells · 138 flops (default mapping)"}],"foot":"Source: <a href='https://github.com/AbhijeetJ-512/axi2apb-bridge'>github.com/AbhijeetJ-512/axi2apb-bridge<\/a>. The simulation is a JavaScript model of <code>src/axi2apb.v<\/code>. Its inputs and outputs for the six scenarios (71 cycles) were replayed through the real RTL in Icarus Verilog and matched in every cycle (<code>docs/explorer_src/validate/<\/code>). The AXI master and the APB slave are re-implemented from the testbench source (the real slave picks its wait states at random), so they are modelled, not replayed."},"VIEW":{"w":1500,"h":700,"bandH":598,"barY":0,"barH":0,"boundary":{"x":364,"y":72,"w":762,"h":536,"label":"axi2apb (src/axi2apb.v)"},"outsideLabel":"testbench + verification (outside the design)"},"BANDS":[{"k":"M","n":"AXI4-Lite master (testbench)","x":10,"w":340,"c":"--b0"},{"k":"B","n":"axi2apb bridge","x":360,"w":770,"c":"--b1"},{"k":"S","n":"APB3 slave model (testbench)","x":1140,"w":350,"c":"--b2"}],"TYPES":{"data":"Address / data","ctl":"Handshake & control","trap":"Error response (PSLVERR → SLVERR)","ver":"Verification only"},"NODES":{"req":{"x":30,"y":90,"w":300,"h":200,"t":"Request channels","s":"AR · AW · W (master → bridge)","l":["AR  ARADDR  ARVALID  ARREADY","AW  AWADDR  AWVALID  AWREADY","W   WDATA   WVALID   WREADY"],"stage":"M","file":"verif/tb_axi2apb.sv:44-66","role":"Three testbench driver processes, one per request channel. Each holds VALID until READY is seen at a clock edge.","resp":["AR driver: waits a per-item delay, asserts ARVALID with ARADDR, holds until ARREADY","AW driver and W driver do the same on their channels, independently of each other","A W beat can arrive before or after its AW; the bridge accepts both only in WRITE_ADDRESS_RECEIVED_STATE"],"code":"initial forever begin                                   // AW driver\n  wait (aw_a_q.size() > 0);\n  repeat (aw_dl_q.pop_front()) @(posedge clk);\n  #1; awaddr = aw_a_q.pop_front(); awvalid = 1'b1;\n  do @(posedge clk); while (!awready);\n  #1; awvalid = 1'b0;\nend","in":["ARREADY, AWREADY, WREADY from the bridge"],"out":["ARVALID, ARADDR","AWVALID, AWADDR","WVALID, WDATA"],"deps":["Output decode"],"ext":1},"resp":{"x":30,"y":380,"w":300,"h":140,"t":"Response channels","s":"B · R (bridge → master)","l":["B   BRESP  BVALID  BREADY","R   RDATA  RRESP  RVALID  RREADY"],"stage":"M","file":"verif/tb_axi2apb.sv:67-100","role":"Two testbench receiver processes. Each raises READY after a delay and holds it until VALID is seen, then checks the response.","resp":["B receiver: BRESP must be OKAY (00), or SLVERR (10) for the error region","R receiver: RDATA must equal the last value written to that word (reference memory in the scoreboard)","Delaying BREADY / RREADY is how back-pressure is applied to the bridge"],"code":"initial forever begin                                   // B receiver + write scoreboard\n  ...\n  #1; bready = 1'b1;\n  do @(posedge clk); while (!bvalid);\n  if (bresp !== 2'b00) fail(...);\n  #1; bready = 1'b0;\nend","in":["BVALID, BRESP","RVALID, RRESP, RDATA"],"out":["BREADY","RREADY"],"deps":["Output decode","Response registers"],"ext":1},"scb":{"x":30,"y":540,"w":300,"h":60,"t":"Scoreboard","s":"tb_axi2apb · 64-word ref_mem","l":["every read returns the last value written"],"stage":"M","file":"verif/tb_axi2apb.sv:40-42,116-118","role":"Reference memory and in-order expectation queues. Not part of the design.","resp":["ref_mem[a[7:2]] is updated on each completed write","A read response is compared with ref_mem; a mismatch is a TB ERROR"],"code":"if (rdata !== ref_mem[a[7:2]])\n  fail($sformatf(\"read of %08x: got %08x, expected %08x\", ...));","in":["B and R responses"],"out":["pass / TB ERROR"],"deps":["Response channels"],"ext":1,"ver":1},"nxt":{"x":380,"y":90,"w":260,"h":200,"t":"Next-state logic","s":"always @(*) · next_state logic","l":["IDLE: ARVALID › AWVALID (read wins)","WA: WVALID → WD","WD: always → PW","PW: PREADY → WT","WT: BREADY → IDLE","RA: always → PR","PR: PREADY → RT","RT: RREADY → IDLE"],"stage":"B","file":"src/axi2apb.v:69-123","role":"Combinational transition function of the 8-state FSM.","resp":["IDLE chooses a read before a write when both VALIDs are high","WRITE_ADDRESS_RECEIVED waits for WVALID","PENABLE_WRITE / PENABLE_READ wait for PREADY (APB wait states)","WDATA_TRANSFERRED / RDATA_TRANSFERRED wait for BREADY / RREADY (AXI back-pressure)"],"code":"IDLE: begin\n  // Give priority to read if both valid\n  if (S_AXI_ARVALID)      next_state = READ_ADDRESS_RECEIVED_STATE;\n  else if (S_AXI_AWVALID) next_state = WRITE_ADDRESS_RECEIVED_STATE;\n  else                    next_state = IDLE;\nend","in":["ARVALID, AWVALID, WVALID","PREADY","BREADY, RREADY","present_state"],"out":["next_state"],"deps":["Request channels","Response channels","APB slave model"]},"st":{"x":380,"y":320,"w":260,"h":80,"t":"FSM state","s":"present_state [2:0]","l":["resets to IDLE (3'b000)"],"stage":"B","file":"src/axi2apb.v:47-67","role":"The only control register: a 3-bit binary-encoded state.","resp":["IDLE 000 · WRITE_ADDRESS_RECEIVED 001 · WRITE_DATA_RECEIVED 010 · PENABLE_WRITE 011","WDATA_TRANSFERRED 100 · READ_ADDRESS_RECEIVED 101 · PENABLE_READ 110 · RDATA_TRANSFERRED 111"],"code":"always @(posedge clk) begin\n  if(~rst_n) present_state <= IDLE;\n  else       present_state <= next_state;\nend","in":["next_state"],"out":["present_state"],"deps":["Next-state logic"]},"dec":{"x":380,"y":430,"w":260,"h":130,"t":"Output decode","s":"always @(*) · Moore outputs","l":["WA: AWREADY, WREADY","WD: PSEL, PWRITE   PW: + PENABLE","WT: BVALID   RT: RVALID","RA: ARREADY, PSEL   PR: + PENABLE"],"stage":"B","file":"src/axi2apb.v:125-172","role":"Decodes the state into the handshake and APB control outputs. No output depends on an input, so every output is glitch-free from a register.","resp":["AWREADY and WREADY are asserted together, only in WRITE_ADDRESS_RECEIVED","PSEL=1, PENABLE=0 is the APB setup phase (WRITE_DATA_RECEIVED, READ_ADDRESS_RECEIVED); PENABLE=1 is the access phase","BVALID / RVALID are high in the transferred states until the master takes the response"],"code":"WRITE_DATA_RECEIVED_STATE: begin\n  M_APB_PSEL   = 1;\n  M_APB_PWRITE = 1;\nend\nPENABLE_WRITE_SIGNAL: begin\n  M_APB_PSEL    = 1;\n  M_APB_PENABLE = 1;\n  M_APB_PWRITE  = 1;\nend","in":["present_state"],"out":["ARREADY, AWREADY, WREADY","BVALID, RVALID","PSEL, PENABLE, PWRITE"],"deps":["FSM state"]},"samp":{"x":680,"y":90,"w":420,"h":90,"t":"Sample registers","s":"sampled_addr · sampled_wdata","l":["address latched in IDLE (ARADDR wins)","sampled_wdata is unused downstream"],"stage":"B","file":"src/axi2apb.v:174-193","role":"Hold the AXI address while the rest of the transaction runs.","resp":["sampled_addr <= ARADDR or AWADDR, only while the FSM is in IDLE","sampled_wdata <= WDATA in WRITE_ADDRESS_RECEIVED / WDATA_TRANSFERRED; lint reports it unused and synthesis removes it (the README lists this as known)"],"code":"always @(posedge clk) begin\n  if(~rst_n) sampled_addr <= 0;\n  else if(present_state == IDLE) begin\n    if(S_AXI_ARVALID)      sampled_addr <= S_AXI_ARADDR;\n    else if(S_AXI_AWVALID) sampled_addr <= S_AXI_AWADDR;\n  end\nend","in":["ARADDR, AWADDR, WDATA","present_state"],"out":["sampled_addr"],"deps":["Request channels","FSM state"]},"apbd":{"x":680,"y":210,"w":420,"h":90,"t":"APB address / data","s":"M_APB_PADDR · M_APB_PWDATA","l":["write: PADDR ← sampled_addr, PWDATA ← WDATA","read: PADDR ← ARADDR in IDLE"],"stage":"B","file":"src/axi2apb.v:195-212","role":"Registered APB address and write data, stable through setup and access.","resp":["On the edge where WVALID is seen in WRITE_ADDRESS_RECEIVED: PADDR <= sampled_addr and PWDATA <= WDATA","On the edge where a read is accepted in IDLE: PADDR <= ARADDR","In RDATA_TRANSFERRED with RREADY, PADDR is reloaded from sampled_addr"],"code":"if ((present_state == WRITE_ADDRESS_RECEIVED_STATE && S_AXI_WVALID) || ...) begin\n  M_APB_PADDR  <= sampled_addr;\n  M_APB_PWDATA <= S_AXI_WDATA;\nend\nelse if (present_state == IDLE && S_AXI_ARVALID)\n  M_APB_PADDR <= S_AXI_ARADDR;","in":["sampled_addr","WDATA, ARADDR","present_state"],"out":["PADDR, PWDATA"],"deps":["Sample registers","Request channels","FSM state"]},"resp_r":{"x":680,"y":330,"w":420,"h":110,"t":"Response registers","s":"BRESP · RRESP · RDATA","l":["captured when PREADY ends the access phase","PSLVERR → 2'b10 (SLVERR), else 2'b00","RDATA only captured without PSLVERR"],"stage":"B","file":"src/axi2apb.v:214-236","role":"Registered AXI responses, held until BREADY / RREADY.","resp":["BRESP <= PSLVERR ? 2'b10 : 2'b00 when PENABLE_WRITE sees PREADY","RRESP likewise on the read side","RDATA <= PRDATA when PENABLE_READ sees PREADY and PSLVERR is low","This was the fixed bug: the as-found RTL used 2'b11 (DECERR), which a bridge cannot produce"],"code":"always @(posedge clk) begin\n  if(~rst_n) S_AXI_BRESP <= 2'b00;\n  else if (present_state == PENABLE_WRITE_SIGNAL && M_APB_PREADY)\n    S_AXI_BRESP <= (M_APB_PSLVERR) ? 2'b10 : 2'b00;\nend","in":["PREADY, PSLVERR, PRDATA","present_state"],"out":["BRESP, RRESP, RDATA"],"deps":["APB slave model","FSM state"]},"chk":{"x":380,"y":622,"w":720,"h":66,"t":"axi2apb_checker (bind)","s":"verif/axi2apb_checker.sv · bound by name","l":["APB3 rules · AXI channel rules · response mapping · arbitration · 17 cover points"],"stage":"","file":"verif/axi2apb_checker.sv, verif/checker_binds.sv","role":"Assertions and cover points attached to the bridge's ports and state; not part of the synthesised design.","resp":["a_penable_needs_psel, a_setup_then_access, a_access_until_ready, a_penable_drops (APB3)","a_addr_stable, a_wdata_stable, a_dir_stable during wait states","a_bvalid_holds / a_rvalid_holds, a_bresp_legal / a_rresp_legal (only OKAY and SLVERR)","a_bresp_maps_slverr, a_rresp_maps_slverr, a_rdata_is_prdata","a_one_outstanding, a_read_priority, a_write_when_no_read"],"code":"bind axi2apb axi2apb_checker u_chk (.*);\na_read_priority: assert property (@(posedge clk) disable iff (!rst_n)\n  (present_state == 3'd0 && S_AXI_ARVALID) |=> present_state == 3'd5);","in":["Bridge ports and present_state, by name (.*)"],"out":["Assertion failures, cover hits"],"deps":["All bridge outputs"],"ext":1,"ver":1},"slv_wait":{"x":1160,"y":90,"w":310,"h":90,"t":"Wait-state counter","s":"apb_slave_model · cnt, pready","l":["loaded in setup, counts down in access","pready = access && cnt == 0"],"stage":"S","file":"verif/apb_slave_model.sv:24-33","role":"Gives each access a programmable number of wait states.","resp":["In the setup phase (psel && !penable) cnt is loaded with a random value in 0..wait_max","In the access phase it counts down; PREADY rises when it reaches 0","wait_max = 0 means PREADY in the first access cycle"],"code":"if (psel && !penable) cnt <= 4'(wait_max == 0 ? 0 : $urandom_range(wait_max, 0));\nelse if (access && cnt != 0) cnt <= cnt - 4'd1;\nassign pready = access && (cnt == 4'd0);","in":["PSEL, PENABLE, PWRITE"],"out":["PREADY"],"deps":["Output decode"],"ext":1},"slv_mem":{"x":1160,"y":210,"w":310,"h":100,"t":"Memory","s":"apb_slave_model · 64 × 32","l":["word index = paddr[7:2]","write on access && pready && pwrite && !err"],"stage":"S","file":"verif/apb_slave_model.sv:16,31,38","role":"The slave's storage.","resp":["Write: mem[paddr[7:2]] <= pwdata on the edge where PREADY is high","Read: prdata = mem[paddr[7:2]] while pready, else the poison value 0xDEADBEEF","Reset clears every word"],"code":"if (access && pready && pwrite && !err_reg) mem[paddr[7:2]] <= pwdata;\nassign prdata = (pready && !pwrite) ? (err_reg ? 32'hBAD0_BAD0 : mem[paddr[7:2]]) : 32'hDEAD_BEEF;","in":["PADDR, PWDATA","write enable from the counter and error decode"],"out":["PRDATA"],"deps":["APB address / data","Wait-state counter","Error region"],"ext":1},"slv_err":{"x":1160,"y":340,"w":310,"h":90,"t":"Error region","s":"apb_slave_model · paddr[11:8] == 4'hF","l":["PSLVERR with the access completed","no memory change, read data 0xBAD0BAD0"],"stage":"S","file":"verif/apb_slave_model.sv:21,37","role":"Any address in 0xF00..0xFFF is an error region.","resp":["err_reg = (paddr[11:8] == 4'hF)","pslverr = pready && err_reg","The write is dropped and a read returns 0xBAD0BAD0"],"code":"wire err_reg = (paddr[11:8] == 4'hF);\nassign pslverr = pready && err_reg;","in":["PADDR[11:8]","pready"],"out":["PSLVERR"],"deps":["APB address / data","Wait-state counter"],"ext":1}},"BARS":{},"EDGES":[{"id":"E01","from":"req","to":"nxt","type":"ctl","label":"ARVALID, AWVALID, WVALID","pts":[[330,120],[380,120]],"desc":"The request VALIDs decide the next state."},{"id":"E02","from":"req","to":"samp","type":"data","label":"ARADDR / AWADDR","pts":[[180,90],[180,72],[890,72],[890,90]],"desc":"The address is captured while the FSM is in IDLE."},{"id":"E03","from":"req","to":"apbd","type":"data","label":"WDATA → PWDATA, ARADDR → PADDR","pts":[[330,280],[345,280],[345,312],[780,312],[780,300]],"desc":"Write data and the read address go straight into the APB registers."},{"id":"E04","from":"nxt","to":"st","type":"ctl","label":"next_state","pts":[[510,290],[510,320]]},{"id":"E05","from":"st","to":"nxt","type":"ctl","label":"present_state","pts":[[420,320],[420,290]]},{"id":"E06","from":"st","to":"dec","type":"ctl","label":"present_state","pts":[[510,400],[510,430]]},{"id":"E07","from":"dec","to":"req","type":"ctl","label":"ARREADY, AWREADY, WREADY","pts":[[380,455],[360,455],[360,230],[330,230]],"desc":"AWREADY and WREADY are high together, in WRITE_ADDRESS_RECEIVED only."},{"id":"E08","from":"dec","to":"resp","type":"ctl","label":"BVALID, RVALID","pts":[[380,500],[330,500]]},{"id":"E09","from":"resp","to":"nxt","type":"ctl","label":"BREADY, RREADY","pts":[[330,400],[374,400],[374,250],[380,250]],"desc":"The FSM stays in a transferred state until the master takes the response."},{"id":"E10","from":"samp","to":"apbd","type":"data","label":"sampled_addr → PADDR","pts":[[890,180],[890,210]]},{"id":"E11","from":"st","to":"resp_r","type":"ctl","label":"present_state: capture at end of access","pts":[[640,360],[680,360]]},{"id":"E12","from":"st","to":"apbd","type":"ctl","label":"present_state: load PADDR / PWDATA","pts":[[640,345],[664,345],[664,270],[680,270]]},{"id":"E13","from":"st","to":"samp","type":"ctl","label":"present_state == IDLE: sample address","pts":[[640,330],[652,330],[652,150],[680,150]]},{"id":"E14","from":"dec","to":"slv_wait","type":"ctl","label":"PSEL, PENABLE, PWRITE","pts":[[640,550],[655,550],[655,575],[1126,575],[1126,130],[1160,130]],"desc":"Setup phase: PSEL=1, PENABLE=0. Access phase: PSEL=1, PENABLE=1."},{"id":"E15","from":"apbd","to":"slv_mem","type":"data","label":"PADDR, PWDATA","pts":[[1100,250],[1160,250]]},{"id":"E16","from":"apbd","to":"slv_err","type":"data","label":"PADDR[11:8]","pts":[[1100,290],[1112,290],[1112,380],[1160,380]]},{"id":"E17","from":"slv_wait","to":"nxt","type":"ctl","label":"PREADY","pts":[[1315,90],[1315,80],[510,80],[510,90]],"desc":"The FSM leaves PENABLE_WRITE / PENABLE_READ when PREADY is high."},{"id":"E18","from":"slv_wait","to":"slv_mem","type":"ctl","label":"access && pready: write strobe","pts":[[1250,180],[1250,210]]},{"id":"E19","from":"slv_err","to":"slv_mem","type":"ctl","label":"err_reg: block write, poison read","pts":[[1400,340],[1400,310]]},{"id":"E20","from":"slv_wait","to":"slv_err","type":"ctl","label":"pready","pts":[[1470,135],[1484,135],[1484,385],[1470,385]]},{"id":"E21","from":"slv_mem","to":"resp_r","type":"data","label":"PRDATA","pts":[[1160,292],[1136,292],[1136,365],[1100,365]]},{"id":"E22","from":"slv_err","to":"resp_r","type":"trap","label":"PSLVERR","pts":[[1160,410],[1100,410]],"desc":"PSLVERR becomes SLVERR (2'b10) on BRESP or RRESP."},{"id":"E23","from":"resp_r","to":"resp","type":"data","label":"BRESP, RRESP, RDATA","pts":[[760,440],[760,592],[352,592],[352,470],[330,470]]},{"id":"E24","from":"resp","to":"scb","type":"ver","label":"responses checked","pts":[[100,520],[100,540]]},{"id":"E25","from":"chk","to":"dec","type":"ver","label":"observes APB and AXI outputs","pts":[[450,622],[450,560]]},{"id":"E26","from":"chk","to":"resp_r","type":"ver","label":"response mapping rules","pts":[[1060,622],[1060,440]]},{"id":"E27","from":"slv_wait","to":"resp_r","type":"ctl","label":"PREADY qualifies the capture","pts":[[1160,165],[1148,165],[1148,345],[1100,345]]}],"GROUPS":[["AXI master (testbench)",["req","resp","scb"]],["Bridge",["nxt","st","dec","samp","apbd","resp_r"]],["APB slave (testbench)",["slv_wait","slv_mem","slv_err"]],["Verification",["chk"]]],"PATHS":[{"g":"Transactions","id":"write","name":"AXI write → APB write","desc":"AW and W accepted together, one APB access, response on B.","steps":[["n:req","The master raises AWVALID with AWADDR on the AW channel. WVALID / WDATA may arrive earlier or later."],["E01","In IDLE the FSM sees AWVALID (and no ARVALID). The next state is WRITE_ADDRESS_RECEIVED."],["E02","AWADDR is captured into sampled_addr while the FSM is still in IDLE."],["E13","The capture is enabled by present_state == IDLE."],["E04","next_state is loaded into the state register at the clock edge."],["E06","WRITE_ADDRESS_RECEIVED decodes to AWREADY = WREADY = 1 (no other output)."],["E07","AWREADY and WREADY go back to the master together: the AW handshake completes, and the W handshake completes if WVALID is up."],["E01","When WVALID is seen in this state the FSM moves to WRITE_DATA_RECEIVED."],["E10","On that same edge PADDR takes sampled_addr…"],["E03","…and PWDATA takes WDATA."],["E14","WRITE_DATA_RECEIVED is the APB setup phase: PSEL = 1, PWRITE = 1, PENABLE = 0."],["E15","PADDR and PWDATA are stable at the slave for the whole access."],["E14","PENABLE_WRITE is the access phase: PENABLE = 1."],["E17","The slave raises PREADY (after its wait states) and the FSM moves to WDATA_TRANSFERRED."],["E18","The slave writes mem[paddr[7:2]] on the edge where PREADY is high."],["E27","PREADY also qualifies the capture of the response."],["E11","BRESP <= OKAY (PSLVERR is low)."],["E08","WDATA_TRANSFERRED decodes to BVALID = 1."],["E23","BRESP and BVALID reach the B channel."],["E09","The FSM waits there until BREADY, then returns to IDLE. BVALID and BRESP are held meanwhile."]]},{"g":"Transactions","id":"read","name":"AXI read → APB read","desc":"AR accepted, one APB access, data returned on R.","steps":[["n:req","The master raises ARVALID with ARADDR on the AR channel."],["E01","In IDLE an ARVALID always wins: next state READ_ADDRESS_RECEIVED."],["E03","ARADDR goes straight into PADDR on the edge that leaves IDLE."],["E12","present_state == IDLE && ARVALID is what loads it."],["E02","ARADDR is also captured in sampled_addr (used to restore PADDR later)."],["E07","READ_ADDRESS_RECEIVED decodes to ARREADY = 1: the AR handshake completes."],["E14","It is also the APB setup phase: PSEL = 1, PWRITE = 0, PENABLE = 0."],["E15","PADDR reaches the slave."],["E14","PENABLE_READ is the access phase: PENABLE = 1."],["E17","The slave raises PREADY after its wait states; the FSM moves to RDATA_TRANSFERRED."],["E21","PRDATA is the stored word (0xDEADBEEF would be poison when PREADY is low)."],["E27","PREADY qualifies the capture."],["E11","RDATA <= PRDATA and RRESP <= OKAY, because PSLVERR is low."],["E08","RDATA_TRANSFERRED decodes to RVALID = 1."],["E23","RDATA, RRESP and RVALID reach the R channel."],["E09","The FSM waits for RREADY, then returns to IDLE."]]},{"g":"Transactions","id":"wait","name":"APB wait states","desc":"PREADY low: the access phase is stretched.","steps":[["E14","The access phase begins: PSEL = 1, PENABLE = 1."],["n:slv_wait","The slave loaded cnt in the setup phase; it counts down while PREADY is low."],["E17","PREADY is low, so the next-state logic keeps the FSM in PENABLE_WRITE / PENABLE_READ."],["E15","PADDR, PWDATA and PWRITE must not change meanwhile (a_addr_stable, a_wdata_stable, a_dir_stable)."],["E17","When cnt reaches 0, PREADY goes high and the access ends on that edge."],["E11","Only then is the response captured."]]},{"g":"Errors","id":"err","name":"APB error → SLVERR","desc":"An address in 0xF00..0xFFF returns PSLVERR; the bridge answers SLVERR (2'b10).","steps":[["E16","The slave decodes paddr[11:8] == 4'hF."],["n:slv_err","pslverr = pready && err_reg. The access still completes."],["E19","A write to this region is blocked and a read returns 0xBAD0BAD0."],["E22","PSLVERR reaches the response registers."],["E11","BRESP / RRESP <= 2'b10 (SLVERR). The as-found RTL wrote 2'b11 (DECERR) here; that was the bug fixed in CH-001."],["E23","On a read error RDATA is not captured (it keeps its previous value)."],["E24","The testbench expects exactly 2'b10 for the error region."],["E26","a_bresp_maps_slverr / a_rresp_maps_slverr check the same mapping in the checker."]]},{"g":"Arbitration & flow control","id":"prio","name":"Read priority","desc":"ARVALID and AWVALID together: the read goes first.","steps":[["E01","Both ARVALID and AWVALID are high in IDLE."],["n:nxt","The IDLE case tests ARVALID first: next state READ_ADDRESS_RECEIVED."],["E02","The read address is the one captured."],["E07","ARREADY is raised; AWREADY stays low, so the write waits."],["E09","After the read response is taken the FSM is in IDLE again and the write is accepted."],["E25","a_read_priority and a_write_when_no_read check this in both directions."]]},{"g":"Arbitration & flow control","id":"bp","name":"Response back-pressure","desc":"BREADY / RREADY low: the response is held.","steps":[["E08","WDATA_TRANSFERRED / RDATA_TRANSFERRED hold BVALID / RVALID high."],["E23","BRESP, or RDATA and RRESP, stay stable while VALID is high and READY is low."],["E09","The next-state logic waits for BREADY / RREADY."],["E09","Only when READY is seen does the FSM return to IDLE and a new request can start (one outstanding transaction)."],["E25","a_bvalid_holds and a_rvalid_holds check that VALID and the payload hold."]]},{"g":"Verification","id":"verify","name":"Scoreboard and bound assertions","desc":"How each transaction is checked.","steps":[["E24","The B and R receivers feed the scoreboard."],["n:scb","A read must return the last value written to that word; response codes must be 00 (or 10 for the error region)."],["E25","Bound assertions watch the APB and AXI outputs every cycle."],["E26","…including the response mapping and RDATA == PRDATA."],["n:chk","15 deliberate bugs were injected: 14 caught, 1 equivalent (B14). B01 and B13 were caught only by an assertion; the testbench alone missed them."]]}]};
+const {META,VIEW,BANDS,TYPES,NODES,BARS,EDGES,GROUPS,PATHS}=DATA;
+// Cycle model of src/axi2apb.v with the testbench's channel drivers/receivers and verif/apb_slave_model.sv.
+// Each cycle: eval() computes every combinational signal from the registers and the master/slave inputs; commit() is the clock edge.
+const ST=['IDLE','WRITE_ADDRESS_RECEIVED','WRITE_DATA_RECEIVED','PENABLE_WRITE','WDATA_TRANSFERRED','READ_ADDRESS_RECEIVED','PENABLE_READ','RDATA_TRANSFERRED'];
+const AB=['I','WA','WS','WE','B','RS','RE','R'];
+const [S_I,S_WA,S_WD,S_PW,S_WT,S_RA,S_PR,S_RT]=[0,1,2,3,4,5,6,7];
+const hx=(v,n=8)=>'0x'+(v>>>0).toString(16).padStart(n,'0');
+const hs=v=>'0x'+(v>>>0).toString(16);
+const SC=[
+ {id:'write',name:'Write, no wait states',desc:'One AXI write: AW and W are accepted together, one APB access with PREADY in the first cycle, then the B response.',
+  aw:[{v:0x10,d:0}],w:[{v:0xCAFE0001,d:0}],ar:[],b:[{d:0}],r:[],waits:[0],plan:[{k:'W',a:0x10,v:0xCAFE0001}]},
+ {id:'wr_rd',name:'Write then read the same word',desc:'The read is requested while the write is still in flight; the bridge serves it after the write finishes and returns the value that was written.',
+  aw:[{v:0x10,d:0}],w:[{v:0xCAFE0001,d:0}],ar:[{v:0x10,d:3}],b:[{d:0}],r:[{d:0}],waits:[1,0],plan:[{k:'W',a:0x10,v:0xCAFE0001},{k:'R',a:0x10}]},
+ {id:'waits',name:'APB wait states',desc:'The slave inserts 3 wait states on the write and 2 on the read. The access phase is stretched; PADDR, PWDATA and PWRITE hold still.',
+  aw:[{v:0x20,d:0}],w:[{v:0x1234ABCD,d:0}],ar:[{v:0x20,d:2}],b:[{d:0}],r:[{d:0}],waits:[3,2],plan:[{k:'W',a:0x20,v:0x1234ABCD},{k:'R',a:0x20}]},
+ {id:'err',name:'APB error → SLVERR',desc:'Addresses 0xF00..0xFFF are an error region in the slave. PSLVERR comes back with the access completed and the bridge answers SLVERR (2\'b10) on both B and R.',
+  aw:[{v:0xF20,d:0}],w:[{v:0xDEAD0001,d:0}],ar:[{v:0xF24,d:2}],b:[{d:0}],r:[{d:0}],waits:[0,1],plan:[{k:'W',a:0xF20,v:0xDEAD0001},{k:'R',a:0xF24}]},
+ {id:'bp',name:'Response back-pressure',desc:'The master delays BREADY and RREADY. BVALID and RVALID stay high with a stable response; the FSM waits in the transferred state and accepts nothing new.',
+  aw:[{v:0x30,d:0}],w:[{v:0x55AA55AA,d:0}],ar:[{v:0x30,d:14}],b:[{d:10}],r:[{d:22}],waits:[0,0],plan:[{k:'W',a:0x30,v:0x55AA55AA},{k:'R',a:0x30}]},
+ {id:'prio',name:'Read and write requested together',desc:'ARVALID and AWVALID are both high in IDLE. The read wins; the write is accepted after the read response has been taken.',
+  aw:[{v:0x24,d:0}],w:[{v:0x0BADF00D,d:0}],ar:[{v:0x20,d:0}],b:[{d:0}],r:[{d:0}],waits:[0,0],plan:[{k:'R',a:0x20},{k:'W',a:0x24,v:0x0BADF00D}]},
+];
+// a testbench channel process: waits d edges, raises its signal, holds it until the partner signal is seen at an edge
+function arm(x){ if(!x.q.length){x.sig=0;x.cur=null;x.cnt=-1;return;} x.cur=x.q.shift(); x.cnt=x.cur.d; x.sig=x.cnt===0?1:0; }
+function mkdrv(items){ const x={q:items.map(i=>({...i})),sig:0,cur:null,cnt:-1,hs:0}; arm(x); return x; }
+function drvEdge(x,partner){ x.hs=0; if(x.sig&&partner){ x.sig=0; x.hs=1; arm(x); } else if(x.cnt>0){ x.cnt--; if(x.cnt===0) x.sig=1; } }
+const SIM={
+ scenarios:SC.map(s=>({id:s.id,name:s.name,desc:s.desc})),
+ options:[],
+ chartTitle:'Transaction timeline',rowLabel:'transaction',chartWindow:60,maxCycles:120,preroll:2,
+ chartHint:'one row per AXI transaction · cell = FSM state · hatched = waiting for PREADY / BREADY / RREADY',
+ reset(id){
+  const s=SC.find(x=>x.id===id)||SC[0];
+  return {sc:s,state:S_I,sa:0,sw:0,paddr:0,pwdata:0,bresp:0,rresp:0,rdata:0,
+   aw:mkdrv(s.aw),w:mkdrv(s.w),ar:mkdrv(s.ar),b:mkdrv(s.b),r:mkdrv(s.r),
+   slv:{cnt:0,wi:0,mem:new Map()},txns:[],cur:null,plan:s.plan.map(p=>({...p,tx:null})),
+   n:{wr:0,rd:0,err:0,wait:0},prev:null,doneAll:false};
+ },
+ eval(M){
+  const s=M.state, cyc=M.cyc, ev=[], act=new Set(), A=(...x)=>x.forEach(i=>act.add(i));
+  const arvalid=M.ar.sig, awvalid=M.aw.sig, wvalid=M.w.sig, bready=M.b.sig, rready=M.r.sig;
+  const araddr=M.ar.cur?M.ar.cur.v:0, awaddr=M.aw.cur?M.aw.cur.v:0, wdata=M.w.cur?M.w.cur.v:0;
+  // Moore outputs (rtl: output control block)
+  const arready=s===S_RA, awready=s===S_WA, wready=s===S_WA, rvalid=s===S_RT, bvalid=s===S_WT;
+  const psel=[S_WD,S_PW,S_RA,S_PR].includes(s), penable=s===S_PW||s===S_PR, pwrite=s===S_WD||s===S_PW;
+  // slave model
+  const access=psel&&penable, err=((M.paddr>>>8)&15)===15, pready=access&&M.slv.cnt===0, pslverr=pready&&err;
+  const mw=(M.paddr>>>2)&63;
+  const prdata=(pready&&!pwrite)?(err?0xBAD0BAD0:(M.slv.mem.get(mw)??0)):0xDEADBEEF;
+  // next-state logic
+  let ns=s;
+  switch(s){
+   case S_I: ns=arvalid?S_RA:awvalid?S_WA:S_I; break;
+   case S_WA: ns=wvalid?S_WD:S_WA; break;
+   case S_WD: ns=S_PW; break;
+   case S_PW: ns=pready?S_WT:S_PW; break;
+   case S_WT: ns=bready?S_I:S_WT; break;
+   case S_RA: ns=S_PR; break;
+   case S_PR: ns=pready?S_RT:S_PR; break;
+   case S_RT: ns=rready?S_I:S_RT; break;
+  }
+  // register updates (computed here, applied in commit)
+  const nx={sa:M.sa,sw:M.sw,paddr:M.paddr,pwdata:M.pwdata,bresp:M.bresp,rresp:M.rresp,rdata:M.rdata};
+  if(s===S_I){ if(arvalid) nx.sa=araddr; else if(awvalid) nx.sa=awaddr; }
+  const wload=(s===S_WA&&wvalid)||(s===S_WT&&wvalid);
+  if(wload) nx.sw=wdata;
+  let padSrc='';
+  if(wload){ nx.paddr=M.sa; nx.pwdata=wdata; padSrc='w'; }
+  else if(s===S_I&&arvalid){ nx.paddr=araddr; padSrc='ar'; }
+  else if(s===S_RT&&rready){ nx.paddr=M.sa; padSrc='rt'; }
+  if(s===S_PW&&pready) nx.bresp=pslverr?2:0;
+  if(s===S_PR&&pready&&!pslverr) nx.rdata=prdata;
+  if(s===S_PR&&pready) nx.rresp=pslverr?2:0;
+  // transaction bookkeeping (display only)
+  if(s===S_I&&(arvalid||awvalid)&&!M.cur){
+    const kind=arvalid?'R':'W', a=arvalid?araddr:awaddr;
+    const pl=M.plan.find(p=>!p.tx&&p.k===kind&&p.a===a);
+    const t={id:M.txns.length,kind,addr:a,label:kind==='W'?`W ${hs(a)} ← ${hs(pl?pl.v:0)}`:`R ${hs(a)}`,color:`var(--t${M.txns.length%8})`,cells:{},notes:[],status:'in flight',
+      wait:0,data:pl?pl.v:0};
+    M.txns.push(t); M.cur=t; if(pl) pl.tx=t.id;
+    ev.push(['ctl',`IDLE → ${ST[ns]}: ${kind==='R'?'ARVALID seen'+(awvalid?' (AWVALID too: the read wins)':''):'AWVALID seen'}`]);
+  }
+  const t=M.cur;
+  if(t){
+    const apb=[S_WD,S_PW,S_RA,S_PR].includes(s);
+    const waiting=(s===S_PW||s===S_PR)?!pready:(s===S_WT?!bready:(s===S_RT?!rready:false));
+    t.cells[cyc]={t:AB[s],col:apb?'--b2':(s===S_I?'--muted':'--b0'),cls:waiting?'st':'',title:ST[s]+(waiting?' (waiting)':'')};
+    if((s===S_PW||s===S_PR)&&!pready){ t.wait++; M.n.wait++; }
+    const note=(col,txt)=>t.notes.push({c:cyc,t:AB[s],col,txt});
+    switch(s){
+     case S_I: note('--muted',`request seen: ${t.kind==='R'?'ARVALID, address '+hs(araddr):'AWVALID, address '+hs(awaddr)}; address sampled`); break;
+     case S_WA: note('--b0',`AWREADY = WREADY = 1${wvalid?'; WVALID seen, PADDR ← '+hs(M.sa)+', PWDATA ← '+hx(wdata):'; waiting for WVALID'}`); break;
+     case S_WD: note('--b2',`APB setup: PSEL=1, PWRITE=1, PENABLE=0; PADDR=${hs(M.paddr)} PWDATA=${hx(M.pwdata)}`); break;
+     case S_PW: note('--b2',pready?`APB access: PREADY=1${pslverr?', PSLVERR=1 (error region)':''}; ${err?'write blocked by the slave':'mem['+hs(M.paddr)+'] ← '+hx(M.pwdata)}`:`APB access: PREADY=0, wait state (${M.slv.cnt} left)`); break;
+     case S_WT: note('--b0',`BVALID=1, BRESP=${M.bresp===2?'SLVERR (10)':'OKAY (00)'}${bready?'; BREADY seen, response taken':'; waiting for BREADY'}`); break;
+     case S_RA: note('--b2',`ARREADY=1; APB setup: PSEL=1, PWRITE=0, PENABLE=0; PADDR=${hs(M.paddr)}`); break;
+     case S_PR: note('--b2',pready?`APB access: PREADY=1${pslverr?', PSLVERR=1 (error region)':', PRDATA='+hx(prdata)}`:`APB access: PREADY=0, wait state (${M.slv.cnt} left)`); break;
+     case S_RT: note('--b0',`RVALID=1, RDATA=${hx(M.rdata)}, RRESP=${M.rresp===2?'SLVERR (10)':'OKAY (00)'}${rready?'; RREADY seen, response taken':'; waiting for RREADY'}`); break;
+    }
+  }
+  // events
+  if(s===S_WA) ev.push(['ctl',`AWREADY = WREADY = 1${wvalid?'; WVALID seen → WRITE_DATA_RECEIVED':'; waiting for WVALID'}`]);
+  if(s===S_WD) ev.push(['data',`APB setup phase: PSEL=1 PWRITE=1; PADDR=${hs(M.paddr)} PWDATA=${hx(M.pwdata)}`]);
+  if(s===S_RA) ev.push(['data',`ARREADY=1; APB setup phase: PSEL=1 PWRITE=0; PADDR=${hs(M.paddr)}`]);
+  if((s===S_PW||s===S_PR)&&!pready) ev.push(['info',`APB access, PREADY=0 (${M.slv.cnt} wait state${M.slv.cnt===1?'':'s'} left)`]);
+  if((s===S_PW||s===S_PR)&&pready){
+    if(pslverr) ev.push(['trap',`PREADY=1 with PSLVERR=1 at ${hs(M.paddr)}: ${s===S_PW?'BRESP':'RRESP'} ← SLVERR (2'b10)${s===S_PW?'; write blocked':'; RDATA not captured (PRDATA 0xBAD0BAD0)'}`]);
+    else if(s===S_PW) ev.push(['data',`PREADY=1: slave writes mem[${hs(M.paddr)}] ← ${hx(M.pwdata)}; BRESP ← OKAY`]);
+    else ev.push(['data',`PREADY=1: PRDATA=${hx(prdata)} captured into RDATA; RRESP ← OKAY`]);
+  }
+  if(s===S_WT&&!bready) ev.push(['info','BVALID=1, BREADY=0: response held (back-pressure)']);
+  if(s===S_RT&&!rready) ev.push(['info','RVALID=1, RREADY=0: response held (back-pressure)']);
+  let fin=false;
+  if(s===S_WT&&bready){ ev.push(['ret',`B handshake: BRESP=${M.bresp===2?'SLVERR':'OKAY'}; write complete → IDLE`]); fin=true; }
+  if(s===S_RT&&rready){ ev.push(['ret',`R handshake: RDATA=${hx(M.rdata)} RRESP=${M.rresp===2?'SLVERR':'OKAY'}; read complete → IDLE`]); fin=true; }
+  let completes=null;
+  if(fin&&t){ t.status=(M.bresp===2&&s===S_WT)||(M.rresp===2&&s===S_RT)?'complete, SLVERR':'complete, OKAY';
+    completes=t; if(M.bresp===2&&s===S_WT||M.rresp===2&&s===S_RT) M.n.err++; if(s===S_WT) M.n.wr++; else M.n.rd++; }
+  // active wires
+  if(s===S_I&&(arvalid||awvalid)){ A('E01','E02','E13'); if(arvalid) A('E03','E12'); }
+  if(s===S_WA){ if(wvalid) A('E01','E10','E03','E12'); }
+  if(s===S_RT&&rready) A('E10','E12');
+  A('E05','E06'); if(ns!==s) A('E04');
+  if(arready||awready) A('E07');
+  if(bvalid||rvalid) A('E08','E23');
+  if(s===S_WT||s===S_RT) A('E09');
+  if(psel) A('E14','E15','E16');
+  if(s===S_PW||s===S_PR){ A('E17','E20','E27'); if(pready) A('E11'); }
+  if(access&&pready&&pwrite&&!err) A('E18');
+  if(access&&err) A('E19');
+  if(pready&&!pwrite) A('E21');
+  if(pslverr) A('E22');
+  if(fin) A('E24');
+  if(s!==S_I) A('E25'); if(pready||fin) A('E26');
+  // done?
+  const doneNow=fin&&(M.n.wr+M.n.rd)>=M.plan.length;
+  const marks={}; if(s!==S_I&&s!==S_WA&&s!==S_RA) marks.st='live'; if(pslverr) marks.slv_err='trapped'; if((s===S_WT&&!bready)||(s===S_RT&&!rready)) marks.dec='stalled'; if((s===S_PW||s===S_PR)&&!pready) marks.slv_wait='stalled';
+  const lit=['st','nxt','dec'];
+  const vals={st:ST[s].replace('_RECEIVED','').replace('_STATE',''),samp:hs(M.sa),apbd:`${hs(M.paddr)} / ${M.pwdata?hx(M.pwdata):'0'}`,
+    resp_r:`B${M.bresp.toString(2).padStart(2,'0')} R${M.rresp.toString(2).padStart(2,'0')}`,slv_wait:`cnt ${M.slv.cnt}`};
+  const occ={M:[arvalid?`ARVALID ${hs(araddr)}`:'',awvalid?`AWVALID ${hs(awaddr)}`:'',wvalid?`WVALID`:'',bready?'BREADY':'',rready?'RREADY':''].filter(Boolean).join(' · ')||'idle',
+    B:ST[s]+(waitingText()),S:psel?(penable?(pready?'access: PREADY':`access: wait (cnt ${M.slv.cnt})`):'setup'):'idle'};
+  function waitingText(){ return ((s===S_PW||s===S_PR)&&!pready)||(s===S_WT&&!bready)||(s===S_RT&&!rready)?'  (waiting)':''; }
+  const chips=[['ARVALID',arvalid,'ctl'],['AWVALID',awvalid,'ctl'],['WVALID',wvalid,'ctl'],['ARREADY',arready,'ctl'],['AW/WREADY',awready,'ctl'],['BVALID',bvalid,'ctl'],['RVALID',rvalid,'ctl'],['BREADY',bready,'ctl'],['RREADY',rready,'ctl'],
+    ['PSEL',psel,'data'],['PENABLE',penable,'data'],['PWRITE',pwrite,'data'],['PREADY',pready,'mem'],['PSLVERR',pslverr,'trap']];
+  const R={act:[...act],lit,marks,vals,occ,chips,events:ev,done:doneNow,doneText:'all transactions in the scenario are complete',
+    sig:{s,ns,arvalid,awvalid,wvalid,bready,rready,pready,pslverr,access,err,psel,penable,pwrite,prdata,nx,padSrc,fin,mw,araddr,awaddr,wdata},completes};
+  return R;
+ },
+ commit(M,R){
+  const g=R.sig;
+  // slave edge
+  const sl=M.slv;
+  if(g.psel&&!g.penable){ sl.cnt=M.sc.waits[sl.wi]??0; sl.wi++; }
+  else if(g.access&&sl.cnt!==0) sl.cnt--;
+  if(g.access&&g.pready&&g.pwrite&&!g.err) sl.mem.set(g.mw,M.pwdata>>>0);
+  // master drivers: handshake uses the pre-edge ready of the bridge
+  const arready=g.s===S_RA, awready=g.s===S_WA, wready=g.s===S_WA, bvalid=g.s===S_WT, rvalid=g.s===S_RT;
+  drvEdge(M.ar,arready); drvEdge(M.aw,awready); drvEdge(M.w,wready); drvEdge(M.b,bvalid); drvEdge(M.r,rvalid);
+  M.prev={sa:M.sa,sw:M.sw,paddr:M.paddr,pwdata:M.pwdata,bresp:M.bresp,rresp:M.rresp,rdata:M.rdata,cnt:sl.cnt,mem:new Map(sl.mem)};
+  Object.assign(M,g.nx); M.state=g.ns;
+  if(g.fin) M.cur=null;
+ },
+ stats(M){ return [['done',M.n.wr+M.n.rd+' / '+M.plan.length],['APB wait cyc',M.n.wait],['SLVERR',M.n.err]]; },
+ listing(M){
+  return M.plan.map((p,i)=>{ const t=p.tx!=null?M.txns[p.tx]:null;
+   const lbl=p.k==='W'?`write ${hs(p.a)} ← ${hx(p.v)}`:`read  ${hs(p.a)}`;
+   return {tx:t?t.id:null,badge:p.k,badgeCol:p.k==='W'?'--b1':'--b0',html:`${lbl} <span class="cm">${t?'# '+t.status:'# pending'}</span>`}; });
+ },
+ stateHTML(M,R){
+  const pv=M.prev||{}; const reg=(n,v,cur)=>`<div class="reg${pv[cur]!==undefined&&pv[cur]!==v?' chg':''}"><span class="r">${n}</span><span class="v">${v}</span></div>`;
+  let h='<div class="regs">'+reg('state',ST[M.state].replace('_RECEIVED','').replace('_STATE',''),'__')+reg('sampled_addr',hs(M.sa),'sa')+reg('PADDR',hs(M.paddr),'paddr')+reg('PWDATA',hx(M.pwdata),'pwdata')+
+   reg('BRESP',M.bresp.toString(2).padStart(2,'0'),'bresp')+reg('RRESP',M.rresp.toString(2).padStart(2,'0'),'rresp')+reg('RDATA',hx(M.rdata),'rdata')+reg('slave cnt',String(M.slv.cnt),'cnt')+'</div>';
+  const words=[...M.slv.mem.entries()].sort((a,b)=>a[0]-b[0]);
+  h+='<div class="small muted">APB slave memory (64 × 32, written words only)</div><div class="regs">'+(words.length?words.map(([k,v])=>`<div class="reg"><span class="r">[${hs(k*4)}]</span><span class="v">${hx(v)}</span></div>`).join(''):'<span class="small muted">nothing written yet</span>')+'</div>';
+  return h;
+ },
+};
+
+
+</script>
+<script>
+// ===================================================================================== engine (shared by every explorer)
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('diagram');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function mk(tag,attrs={},parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; }
+const EMAP=Object.fromEntries(EDGES.map(e=>[e.id,e]));
+const occText={};
+function nodeName(id){ return NODES[id]?NODES[id].t:BARS[id]?BARS[id].t+' register':id; }
+function obj(id){ return NODES[id]||BARS[id]; }
+
+function buildMeta(){
+  const m=META;
+  document.getElementById('m-eyebrow').textContent=m.eyebrow;
+  document.getElementById('m-title').textContent=m.title;
+  document.getElementById('m-lede').textContent=m.lede;
+  document.getElementById('m-specs').innerHTML=m.specs.map(s=>`<span class="spec">${esc(s[0])} <b>${esc(s[1])}</b>${s[2]?' '+esc(s[2]):''}</span>`).join('');
+  document.getElementById('tab-sim').textContent=m.runLabel||'Run a scenario';
+  document.getElementById('sim-h').textContent=m.scenarioLabel||'Scenario';
+  document.getElementById('chart-h').textContent=SIM.chartTitle||'Timeline';
+  document.getElementById('chart-hint').textContent=SIM.chartHint||'';
+  const notes=document.getElementById('notes');
+  for(const n of m.notes||[]) notes.insertAdjacentHTML('beforeend',`<section class="sheet"><h2>${esc(n.h)}</h2><ul>${n.items.map(i=>`<li>${i}</li>`).join('')}</ul></section>`);
+  if(m.figures) notes.insertAdjacentHTML('beforeend',`<section class="sheet"><h2>${esc(m.figuresTitle||'Measured results')}</h2><div class="figs">${m.figures.map(f=>`<div class="fig"><div class="k">${esc(f.k)}</div><div class="v">${esc(f.v)}</div><div class="s">${esc(f.s)}</div></div>`).join('')}</div></section>`);
+  if(m.foot) document.getElementById('foot').innerHTML=m.foot;
+  svg.setAttribute('viewBox',`0 0 ${VIEW.w} ${VIEW.h}`);
+  svg.setAttribute('aria-label',m.diagramLabel||m.title);
+}
+
+function build(){
+  const defs=mk('defs',{},svg);
+  const pat=mk('pattern',{id:'dots',width:16,height:16,patternUnits:'userSpaceOnUse'},defs); mk('circle',{cx:1,cy:1,r:.9,class:'dotgrid'},pat);
+  for(const t of Object.keys(TYPES)){ const m=mk('marker',{id:'ar-'+t,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},defs); mk('path',{d:'M0 0L10 5L0 10z',class:'mk-'+t},m); }
+  mk('rect',{x:0,y:0,width:VIEW.w,height:VIEW.h,fill:'url(#dots)'},svg);
+  const gb=mk('g',{},svg);
+  for(const s of BANDS){
+    mk('rect',{x:s.x,y:12,width:s.w,height:VIEW.bandH,class:'band',rx:4,opacity:.55},gb);
+    mk('rect',{x:s.x,y:12,width:s.w,height:4,fill:`var(${s.c})`,rx:2},gb);
+    const t=mk('text',{x:s.x+10,y:36,class:'bandlbl',fill:`var(${s.c})`},gb); t.textContent=s.n;
+    const o=mk('text',{x:s.x+10,y:55,class:'occ'},gb); o.textContent=''; occText[s.k]=o;
+  }
+  if(VIEW.boundary){ const b=VIEW.boundary; mk('rect',{x:b.x,y:b.y,width:b.w,height:b.h,class:'boundary',rx:6},gb);
+    const l=mk('text',{x:b.x+b.w-6,y:b.y+b.h-6,class:'boundlbl','text-anchor':'end'},gb); l.textContent=b.label; }
+  if(VIEW.outsideLabel){ const l=mk('text',{x:VIEW.w-12,y:VIEW.h-4,class:'boundlbl','text-anchor':'end'},gb); l.textContent=VIEW.outsideLabel; }
+  const ge=mk('g',{id:'edges'},svg);
+  for(const e of EDGES){
+    const g=mk('g',{class:'edge t-'+e.type,'data-id':e.id},ge);
+    const d='M'+e.pts.map(p=>p.join(' ')).join(' L');
+    e.path=mk('path',{d,class:'ln','marker-end':`url(#ar-${e.type})`},g);
+    mk('path',{d,class:'hit'},g);
+    e.g=g; e.len=e.path.getTotalLength();
+    g.addEventListener('mouseenter',ev=>showTip(ev,`<b>${esc(e.label)}</b><br><span class="muted">${esc(nodeName(e.from))} → ${esc(nodeName(e.to))} · ${esc(TYPES[e.type])}</span>${e.desc?'<br>'+esc(e.desc):''}`));
+    g.addEventListener('mousemove',moveTip); g.addEventListener('mouseleave',hideTip);
+    g.addEventListener('click',()=>inspectEdge(e.id));
+  }
+  const gbar=mk('g',{},svg);
+  for(const [id,b] of Object.entries(BARS)){
+    const y=b.y??VIEW.barY, h=b.h??VIEW.barH;
+    const g=mk('g',{class:'bar','data-id':id,tabindex:0,role:'button','aria-label':b.t+' register'},gbar);
+    mk('rect',{x:b.x,y,width:18,height:h,rx:3,class:'reg'},g);
+    const cy=y+h/2; const t=mk('text',{x:b.x+13,y:cy,transform:`rotate(-90 ${b.x+13} ${cy})`,'text-anchor':'middle'},g); t.textContent=b.t+(b.noSuffix?'':' register');
+    b.g=g; g.addEventListener('click',()=>inspectNode(id)); g.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();inspectNode(id);}});
+  }
+  const gn=mk('g',{},svg);
+  for(const [id,n] of Object.entries(NODES)){
+    const g=mk('g',{class:'node'+(n.ext?' ext':'')+(n.ver?' ver':''),'data-id':id,tabindex:0,role:'button','aria-label':n.t},gn);
+    mk('rect',{x:n.x,y:n.y,width:n.w,height:n.h,rx:5,class:'box'},g);
+    let y=n.y+19; const t=mk('text',{x:n.x+10,y,class:'nt'},g); t.textContent=n.t;
+    y+=15; const s=mk('text',{x:n.x+10,y,class:'ns'},g); s.textContent=n.s;
+    for(const l of (n.l||[])){ y+=14; if(y>n.y+n.h-6) break; const tl=mk('text',{x:n.x+10,y,class:'nl'},g); tl.textContent=l; }
+    n.val=mk('text',{x:n.x+n.w-8,y:n.y+19,class:'nv','text-anchor':'end'},g);
+    n.g=g; g.addEventListener('click',()=>inspectNode(id)); g.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();inspectNode(id);}});
+  }
+  mk('g',{id:'labels'},svg);
+  mk('g',{id:'particles'},svg);
+}
+const tip=document.getElementById('tip');
+function showTip(ev,html){ tip.innerHTML=html; tip.hidden=false; moveTip(ev); }
+function moveTip(ev){ const x=Math.min(ev.clientX+14,window.innerWidth-tip.offsetWidth-8), y=Math.min(ev.clientY+14,window.innerHeight-tip.offsetHeight-8); tip.style.left=x+'px'; tip.style.top=y+'px'; }
+function hideTip(){ tip.hidden=true; }
+
+const hiddenTypes=new Set();
+function buildLegend(){
+  const lg=document.getElementById('legend');
+  for(const [t,name] of Object.entries(TYPES)){
+    if(!EDGES.some(e=>e.type===t)) continue;
+    const b=document.createElement('button'); b.className='lg'; b.setAttribute('aria-pressed','true');
+    b.innerHTML=`<svg viewBox="0 0 30 10"><g class="edge t-${t}"><path class="ln" d="M1 5 L24 5" marker-end="url(#ar-${t})"/></g></svg>${esc(name)}`;
+    b.onclick=()=>{ const on=b.getAttribute('aria-pressed')==='true'; b.setAttribute('aria-pressed',on?'false':'true'); on?hiddenTypes.add(t):hiddenTypes.delete(t); applyHidden(); };
+    lg.appendChild(b);
+  }
+  if(Object.keys(BARS).length){ const reg=document.createElement('span'); reg.className='lg'; reg.style.cursor='default';
+    reg.innerHTML=`<svg viewBox="0 0 30 10"><rect x="11" y="0" width="8" height="10" rx="1.5" fill="var(--surface-2)" stroke="var(--ink)" stroke-opacity=".5"/></svg>${esc(META.barLegend||'Register (posedge clk)')}`; lg.appendChild(reg); }
+  const n=document.createElement('span'); n.className='note'; n.textContent='Hover a wire for its signals'; lg.appendChild(n);
+}
+function applyHidden(){ for(const e of EDGES) e.g.classList.toggle('hidden',hiddenTypes.has(e.type)); rebuildParticles(); }
+
+// ---------------------------------------------------------------------------------- inspector
+const inspSlot=document.getElementById('insp-slot');
+let selNode=null;
+function li(arr){ return arr&&arr.length?'<ul>'+arr.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':'<span class="muted">—</span>'; }
+function inspectNode(id){
+  const n=obj(id); if(!n) return;
+  if(selNode) obj(selNode).g.classList.remove('sel');
+  selNode=id; n.g.classList.add('sel');
+  const ins=EDGES.filter(e=>e.to===id), outs=EDGES.filter(e=>e.from===id);
+  const conn=(arr,dir)=>arr.length?'<ul>'+arr.map(e=>`<li><a href="#" data-e="${e.id}" class="mono" style="color:var(--${e.type})">${esc(e.label)}</a> <span class="muted small">${dir} ${esc(nodeName(dir==='from'?e.from:e.to))}</span></li>`).join('')+'</ul>':'<span class="muted">—</span>';
+  const isBar=!!BARS[id]; const band=BANDS.find(b=>b.k===n.stage);
+  inspSlot.innerHTML=`<div class="insp" role="region" aria-label="Inspector">
+    <div class="ih"><div><div class="eyebrow">${isBar?'register':(band?esc(band.n):'outside the design')}</div><h3>${esc(nodeName(id))}</h3><div class="file">${esc(n.file||'')}</div></div><button class="x" aria-label="Close inspector">×</button></div>
+    <p class="small">${esc(n.role||'')}</p>
+    <dl class="kv">
+      <dt>Does</dt><dd>${li(n.resp)}</dd>
+      ${n.in?`<dt>Inputs</dt><dd>${li(n.in)}</dd>`:''}${n.out?`<dt>Outputs</dt><dd>${li(n.out)}</dd>`:''}${n.deps?`<dt>Depends on</dt><dd>${li(n.deps)}</dd>`:''}
+      <dt>Wires in</dt><dd>${conn(ins,'from')}</dd>
+      <dt>Wires out</dt><dd>${conn(outs,'to')}</dd>
+    </dl>
+    ${n.code?`<pre class="code">${esc(n.code)}</pre>`:''}</div>`;
+  inspSlot.querySelector('.x').onclick=closeInspector;
+  inspSlot.querySelectorAll('a[data-e]').forEach(a=>a.onclick=ev=>{ev.preventDefault();inspectEdge(a.dataset.e);});
+  if(mode==='explore') focusNode(id);
+  document.getElementById('panel').scrollTop=0;
+}
+function inspectEdge(eid){
+  const e=EMAP[eid];
+  if(selNode){ obj(selNode).g.classList.remove('sel'); selNode=null; }
+  inspSlot.innerHTML=`<div class="insp" role="region" aria-label="Inspector">
+    <div class="ih"><div><div class="eyebrow">wire · ${esc(TYPES[e.type])}</div><h3 class="mono" style="font-size:14px">${esc(e.label)}</h3></div><button class="x" aria-label="Close inspector">×</button></div>
+    <dl class="kv"><dt>From</dt><dd><a href="#" data-n="${e.from}">${esc(nodeName(e.from))}</a></dd><dt>To</dt><dd><a href="#" data-n="${e.to}">${esc(nodeName(e.to))}</a></dd>
+    ${e.desc?`<dt>Meaning</dt><dd>${esc(e.desc)}</dd>`:''}
+    <dt>Used in</dt><dd>${li(PATHS.filter(p=>p.steps.some(s=>s[0]===eid)).map(p=>p.name))}</dd></dl></div>`;
+  inspSlot.querySelector('.x').onclick=closeInspector;
+  inspSlot.querySelectorAll('a[data-n]').forEach(a=>a.onclick=ev=>{ev.preventDefault();inspectNode(a.dataset.n);});
+  if(mode==='explore') focusEdges([eid],[e.from,e.to]);
+}
+function closeInspector(){ inspSlot.innerHTML=''; if(selNode){obj(selNode).g.classList.remove('sel'); selNode=null;} if(mode==='explore') clearFocus(); }
+
+function clearOn(){ svg.querySelectorAll('.on').forEach(x=>x.classList.remove('on')); }
+function clearFocus(){ svg.classList.remove('focus'); clearOn(); clearLabels(); rebuildParticles(); }
+function focusNode(id){ const es=EDGES.filter(e=>e.from===id||e.to===id).map(e=>e.id); const ns=new Set([id]); es.forEach(x=>{ns.add(EMAP[x].from);ns.add(EMAP[x].to);}); focusEdges(es,[...ns]); }
+function focusEdges(eids,nids){ svg.classList.add('focus'); clearOn(); eids.forEach(x=>EMAP[x].g.classList.add('on')); nids.forEach(n=>obj(n)?.g.classList.add('on')); drawLabels(eids); rebuildParticles(eids); }
+function clearLabels(){ document.getElementById('labels').innerHTML=''; }
+function drawLabels(eids){
+  clearLabels(); const gl=document.getElementById('labels');
+  for(const id of eids){ const e=EMAP[id]; if(hiddenTypes.has(e.type)) continue;
+    let best=0,bi=0; for(let i=0;i<e.pts.length-1;i++){ const L=Math.hypot(e.pts[i+1][0]-e.pts[i][0],e.pts[i+1][1]-e.pts[i][1]); if(L>best){best=L;bi=i;} }
+    const [a,b]=[e.pts[bi],e.pts[bi+1]]; const x=(a[0]+b[0])/2, y=(a[1]+b[1])/2;
+    const g=mk('g',{class:'elbl'},gl); const t=mk('text',{x,y:y+3.5,'text-anchor':'middle'},g); t.textContent=e.label;
+    const bb=t.getBBox(); const r=mk('rect',{x:bb.x-4,y:bb.y-2,width:bb.width+8,height:bb.height+4,rx:3}); g.insertBefore(r,t);
+  }
+}
+
+// ---------------------------------------------------------------------------------- animation
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let mode='sim', playing=!reduce, speed=1, last=performance.now(), T=0, pl=null, parts=[];
+function rebuildParticles(only){
+  pl.innerHTML=''; parts=[];
+  if(mode!=='explore') return;
+  const list=(only&&only.length)?only.map(x=>EMAP[x]):EDGES;
+  for(const e of list){ if(hiddenTypes.has(e.type)) continue;
+    const n=Math.max(1,Math.round(e.len/150));
+    for(let i=0;i<n;i++){ const c=mk('circle',{r:3,class:'p-'+e.type},pl); parts.push({e,c,off:i/n}); } }
+}
+function placeAt(c,e,u){ const p=e.path.getPointAtLength(Math.max(0,Math.min(1,u))*e.len); c.setAttribute('cx',p.x); c.setAttribute('cy',p.y); }
+function frame(now){
+  const dt=Math.min(.1,(now-last)/1000); last=now;
+  if(playing){ T+=dt*speed; if(mode==='sim') simTick(dt*speed); else if(mode==='path') pathTick(dt*speed); }
+  if(mode==='explore'){ for(const p of parts){ const u=((T*55/p.e.len)+p.off)%1; placeAt(p.c,p.e,u); } }
+  requestAnimationFrame(frame);
+}
+function train(eids,u){
+  pl.innerHTML='';
+  for(const id of eids){ const e=EMAP[id]; if(!e||hiddenTypes.has(e.type)) continue;
+    const n=e.len>260?3:e.len>90?2:1;
+    for(let i=0;i<n;i++){ const uu=u-i*0.09; if(uu<0||uu>1) continue; const c=mk('circle',{r:i===0?4:3,class:'p-'+e.type,opacity:1-i*.28},pl); placeAt(c,e,uu); } }
+}
+
+// ---------------------------------------------------------------------------------- path mode
+let curPath=null, pstep=0, pphase=0;
+function buildPathList(){
+  const box=document.getElementById('pathlist'); box.innerHTML='';
+  for(const g of [...new Set(PATHS.map(p=>p.g))]){ const d=document.createElement('div'); d.className='pgroup'; d.innerHTML=`<div class="gl">${esc(g)}</div>`;
+    for(const p of PATHS.filter(p=>p.g===g)){ const b=document.createElement('button'); b.className='pbtn'; b.textContent=p.name; b.dataset.id=p.id; b.setAttribute('aria-pressed','false'); b.title=p.desc||''; b.onclick=()=>selectPath(p.id); d.appendChild(b); }
+    box.appendChild(d); }
+}
+function selectPath(id){
+  curPath=PATHS.find(p=>p.id===id); pstep=0; pphase=0;
+  document.querySelectorAll('#pathlist .pbtn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id?'true':'false'));
+  const ol=document.getElementById('steps'); ol.innerHTML='';
+  curPath.steps.forEach((s,i)=>{ const li=document.createElement('li'); li.textContent=s[1]; li.onclick=()=>{pstep=i;pphase=0;renderPath();}; ol.appendChild(li); });
+  renderPath();
+}
+function renderPath(){
+  if(!curPath) return;
+  const st=curPath.steps[pstep], k=st[0];
+  const eids=[...new Set(curPath.steps.slice(0,pstep+1).map(s=>s[0]).filter(x=>!x.startsWith('n:')))];
+  const nids=new Set(); eids.forEach(x=>{nids.add(EMAP[x].from);nids.add(EMAP[x].to);});
+  curPath.steps.slice(0,pstep+1).forEach(s=>{ if(s[0].startsWith('n:')) nids.add(s[0].slice(2)); });
+  svg.classList.add('focus'); clearOn(); eids.forEach(x=>EMAP[x].g.classList.add('on')); nids.forEach(n=>obj(n)?.g.classList.add('on'));
+  svg.querySelectorAll('.live').forEach(x=>x.classList.remove('live'));
+  if(k.startsWith('n:')) obj(k.slice(2)).g.classList.add('live'); else obj(EMAP[k].to)?.g.classList.add('live');
+  drawLabels(k.startsWith('n:')?[]:[k]);
+  document.getElementById('caption').innerHTML=`<b>${pstep+1} / ${curPath.steps.length}</b> · ${esc(st[1])}`;
+  document.querySelectorAll('#steps li').forEach((li,i)=>{ li.className=i<pstep?'done':i===pstep?'cur':''; });
+  const cur=document.querySelector('#steps li.cur'); const p=document.getElementById('panel');
+  if(cur&&mode==='path'){ const r=cur.getBoundingClientRect(), pr=p.getBoundingClientRect(); if(r.bottom>pr.bottom||r.top<pr.top) p.scrollTop+=r.top-pr.top-pr.height/2; }
+  if(!k.startsWith('n:')) train([k],0); else pl.innerHTML='';
+}
+function pathTick(dt){
+  if(!curPath) return;
+  pphase+=dt/1.5; const k=curPath.steps[pstep][0];
+  if(!k.startsWith('n:')) train([k],Math.min(1.2,pphase*1.15));
+  if(pphase>=1){ pphase=0; if(pstep<curPath.steps.length-1){ pstep++; renderPath(); } else { pphase=-0.8; pstep=0; renderPath(); } }
+}
+
+// ---------------------------------------------------------------------------------- run mode
+let M=null, R=null, simPhase=0, done=false, logRows=[], trackTx=null, opts={};
+function simReset(){
+  const sc=document.getElementById('scenario').value;
+  M=SIM.reset(sc,opts); M.cyc=0; M.txns=M.txns||[]; done=false; logRows=[]; trackTx=null; simPhase=0;
+  document.getElementById('scen-desc').textContent=(SIM.scenarios.find(s=>s.id===sc)||{}).desc||'';
+  enterCycle();
+}
+function enterCycle(){
+  M.cyc++; R=SIM.eval(M);
+  (R.events||[]).forEach(e=>logRows.unshift([M.cyc,e[0],e[1]]));
+  if(R.done){ done=true; logRows.unshift([M.cyc,'info',R.doneText||'scenario complete']); }
+  paintCycle();
+}
+function paintCycle(){
+  document.getElementById('cyc-n').textContent=M.cyc;
+  const act=R.act||[];
+  svg.classList.add('focus'); clearOn(); clearLabels();
+  act.forEach(id=>EMAP[id]?.g.classList.add('on'));
+  const nids=new Set(); act.forEach(id=>{ if(EMAP[id]){ nids.add(EMAP[id].from); nids.add(EMAP[id].to);} });
+  (R.lit||[]).forEach(n=>nids.add(n));
+  nids.forEach(n=>obj(n)?.g.classList.add('on'));
+  svg.querySelectorAll('.trapped,.stalled,.flushed,.held,.live').forEach(x=>x.classList.remove('trapped','stalled','flushed','held','live'));
+  for(const [n,c] of Object.entries(R.marks||{})) obj(n)?.g.classList.add(c);
+  for(const n of Object.values(NODES)) n.val.textContent='';
+  for(const [n,v] of Object.entries(R.vals||{})) if(NODES[n]) NODES[n].val.textContent=v;
+  for(const b of BANDS){ const o=occText[b.k]; const v=(R.occ||{})[b.k]; o.textContent=v||''; o.classList.toggle('live',!!v); }
+  document.getElementById('sigchips').innerHTML=(R.chips||[]).map(c=>`<span class="chip c-${c[2]}${c[1]?' on':''}">${esc(c[0])}</span>`).join('');
+  document.getElementById('stats').innerHTML=SIM.stats(M).map(s=>`<div class="stat"><div class="k">${esc(s[0])}</div><div class="v">${esc(s[1])}</div></div>`).join('');
+  renderListing(); renderChart(); renderLog(); renderJourney();
+  document.getElementById('state').innerHTML=SIM.stateHTML(M,R);
+}
+function commitCycle(){
+  for(const id of (R.pulse||Object.keys(BARS))){ const b=BARS[id]; if(!b) continue; b.g.classList.add('pulse'); setTimeout(()=>b.g.classList.remove('pulse'),Math.max(120,260/speed)); }
+  SIM.commit(M,R); enterCycle();
+}
+function simTick(dt){
+  if(done){ pl.innerHTML=''; return; }
+  simPhase+=dt/1.7; train(R.act||[],Math.min(1,simPhase/0.78));
+  if(simPhase>=1){ simPhase=0; if(M.cyc>=(SIM.maxCycles||400)){done=true;return;} commitCycle(); }
+}
+function simStep(){ if(done) return; simPhase=0; commitCycle(); train(R.act||[],0); }
+function renderListing(){
+  const box=document.getElementById('listing'); const items=SIM.listing?SIM.listing(M,R):[];
+  box.hidden=!items.length;
+  box.innerHTML=items.map(it=>`<div class="ln${it.tx!=null&&it.tx===trackTx?' sel':''}" ${it.tx!=null?`data-tx="${it.tx}"`:''}><span class="stg" style="background:${it.badge?`var(${it.badgeCol||'--accent'})`:'transparent'}">${esc(it.badge||'')}</span><span>${it.html}</span></div>`).join('');
+  box.querySelectorAll('[data-tx]').forEach(d=>d.onclick=()=>{ trackTx=+d.dataset.tx; renderListing(); renderChart(); renderJourney(); });
+}
+function renderChart(){
+  const tb=document.getElementById('chart'); const maxC=Math.max(M.cyc,14); const first=Math.max(1,maxC-(SIM.chartWindow||80)+1);
+  let h=`<thead><tr><th class="ins">${esc(SIM.rowLabel||'item')}</th>`; for(let c=first;c<=maxC;c++) h+=`<th${c===M.cyc?' style="color:var(--ink)"':''}>${c}</th>`; h+='</tr></thead><tbody>';
+  for(const t of M.txns){
+    h+=`<tr data-t="${t.id}" class="${trackTx===t.id?'sel':''} ${t.sq?'squashed':''}"><th class="ins" title="${esc(t.label)}"><span style="color:${t.color}">●</span> ${esc(t.label)}</th>`;
+    for(let c=first;c<=maxC;c++){ const v=t.cells[c]; h+=`<td class="${c===M.cyc?'cur':''}">${v?`<span class="cell${v.cls?' '+v.cls:''}" style="background:var(${v.col||'--accent'})" title="${esc(v.title||'')}">${esc(v.t)}</span>`:''}</td>`; }
+    h+='</tr>'; }
+  tb.innerHTML=h+'</tbody>';
+  tb.querySelectorAll('tbody tr').forEach(tr=>tr.querySelector('th').onclick=()=>{ trackTx=+tr.dataset.t; renderListing(); renderChart(); renderJourney(); });
+  const w=document.getElementById('chartwrap'); w.scrollLeft=w.scrollWidth;
+}
+function renderJourney(){
+  const box=document.getElementById('journey'), hint=document.getElementById('journey-hint');
+  const t=M.txns.find(x=>x.id===trackTx);
+  if(!t){ box.innerHTML=''; hint.hidden=false; return; } hint.hidden=true;
+  box.innerHTML=`<div class="small"><span style="color:${t.color}">●</span> <b class="mono">${esc(t.label)}</b> <span class="muted">${esc(t.status||'')}</span></div>`+
+    t.notes.map(n=>`<div class="j"><span class="c">C${n.c}</span><span class="s" style="background:var(${n.col||'--accent'})">${esc(n.t)}</span><span>${esc(n.txt)}</span></div>`).join('');
+}
+function renderLog(){ document.getElementById('log').innerHTML=logRows.slice(0,160).map(r=>`<div class="e k-${r[1]}"><span class="c">C${r[0]}</span><span>${esc(r[2])}</span></div>`).join('')||'<span class="small muted">Events appear as the scenario runs.</span>'; }
+
+function buildModList(){
+  const box=document.getElementById('modlist');
+  for(const [g,ids] of GROUPS){ const d=document.createElement('div'); d.className='pgroup'; d.innerHTML=`<div class="gl">${esc(g)}</div>`;
+    for(const id of ids){ const b=document.createElement('button'); b.className='pbtn'; b.textContent=nodeName(id); b.onclick=()=>inspectNode(id); d.appendChild(b); } box.appendChild(d); }
+}
+function buildOptions(){
+  const box=document.getElementById('opts');
+  for(const o of SIM.options||[]){
+    opts[o.id]=o.def;
+    const row=document.createElement('div'); row.className='row small';
+    row.innerHTML=`<span class="muted">${esc(o.label)}</span><div class="seg" role="group" aria-label="${esc(o.label)}">${o.choices.map(c=>`<button data-v="${c.v}" aria-pressed="${c.v===o.def}">${esc(c.label)}</button>`).join('')}</div><span class="muted" data-desc></span>`;
+    const setDesc=()=>row.querySelector('[data-desc]').textContent=o.desc?o.desc(opts[o.id]):'';
+    row.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const v=isNaN(+b.dataset.v)?b.dataset.v:+b.dataset.v; opts[o.id]=v; row.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false')); setDesc(); simReset(); });
+    setDesc(); box.appendChild(row);
+  }
+}
+function setMode(m){
+  mode=m; document.body.dataset.mode=m;
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.mode===m?'true':'false'));
+  clearLabels(); pl.innerHTML=''; svg.querySelectorAll('.trapped,.stalled,.flushed,.held,.live').forEach(x=>x.classList.remove('trapped','stalled','flushed','held','live'));
+  for(const k of Object.keys(occText)){ occText[k].textContent=''; occText[k].classList.remove('live'); }
+  for(const n of Object.values(NODES)) n.val.textContent='';
+  document.getElementById('btn-step').disabled=(m==='explore');
+  if(m==='explore'){ clearFocus(); if(selNode) focusNode(selNode); }
+  if(m==='path'){ if(!curPath) selectPath(PATHS[0].id); else renderPath(); }
+  if(m==='sim') paintCycle();
+}
+function setPlaying(p){ playing=p; document.getElementById('lbl-play').textContent=p?'Pause':'Play'; document.getElementById('btn-play').setAttribute('aria-label',p?'Pause':'Play');
+  document.getElementById('ico-play').innerHTML=p?'<rect x="3" y="2" width="3.5" height="12"/><rect x="9.5" y="2" width="3.5" height="12"/>':'<path d="M3 2l11 6-11 6z"/>'; }
+
+buildMeta(); build(); pl=document.getElementById('particles'); buildLegend(); buildPathList(); buildModList();
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+document.getElementById('btn-play').onclick=()=>{ if(mode==='sim'&&done&&!playing) simReset(); setPlaying(!playing); };
+document.getElementById('btn-step').onclick=()=>{ setPlaying(false); if(mode==='sim') simStep(); else if(mode==='path'&&curPath){ pstep=(pstep+1)%curPath.steps.length; pphase=0; renderPath(); } };
+document.getElementById('btn-restart').onclick=()=>{ if(mode==='sim') simReset(); else if(mode==='path'&&curPath){ pstep=0; pphase=0; renderPath(); } else T=0; };
+const sp=document.getElementById('speed'); sp.oninput=()=>{ speed=Math.pow(2,+sp.value); document.getElementById('speed-out').textContent=speed.toFixed(2)+'×'; };
+document.addEventListener('keydown',ev=>{ if(ev.target.closest('input,select,textarea')) return;
+  if(ev.key===' '&&!ev.target.closest('button,[role=button]')){ ev.preventDefault(); document.getElementById('btn-play').click(); }
+  if(ev.key==='ArrowRight') document.getElementById('btn-step').click();
+  if(ev.key==='Escape') closeInspector(); });
+const scSel=document.getElementById('scenario'); SIM.scenarios.forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=s.name; scSel.appendChild(o); });
+scSel.onchange=()=>{ simReset(); setPlaying(!reduce); };
+buildOptions();
+document.body.dataset.mode='sim';
+simReset();
+for(let i=0;i<(SIM.preroll||0)&&!done;i++){ SIM.commit(M,R); enterCycle(); }
+setPlaying(playing);
+requestAnimationFrame(t=>{last=t;frame(t);});
+</script>
+</body>
+</html>
